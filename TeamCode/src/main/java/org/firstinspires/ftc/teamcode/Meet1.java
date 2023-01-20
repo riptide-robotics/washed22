@@ -23,16 +23,17 @@ public class Meet1 extends LinearOpMode {
         DcMotor motorBackLeft = hardwareMap.dcMotor.get("leftRear");
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("rightFront");
         DcMotor motorBackRight = hardwareMap.dcMotor.get("rightRear");
-        //DcMotor slides = hardwareMap.dcMotor.get("slides");
-       //Servo servo0 = hardwareMap.servo.get("servo0");
-        //Servo servo1 = hardwareMap.servo.get("servo1");
+        DcMotor slides = hardwareMap.dcMotor.get("slides");
+       Servo servo0 = hardwareMap.servo.get("servo0");
+       Servo servo1 = hardwareMap.servo.get("servo1");
        // int encoderValue = 0;
-      //  boolean bool = false;
-
+        boolean bool = false;
+        motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
         // Reverse the right side motors
         // Reverse left motors if you are using NeveRests
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        //motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        //motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
       //  slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
       //  slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -45,15 +46,15 @@ public class Meet1 extends LinearOpMode {
             return;
 
         while (opModeIsActive()) {
-            double y = -gamepad1.left_stick_y * 0.47; // Remember, this is reversed!
+            double y = gamepad1.left_stick_y * 0.47; // Remember, this is reversed!
             double x = gamepad1.left_stick_x * 1.1 * 0.47; // Counteract imperfect strafing
-            double rx = gamepad1.right_stick_x * 0.47;
+            double rx = -gamepad1.right_stick_x * 0.47;
 
             if(gamepad1.right_bumper)
             {
                 y = 0.6 * y;
                 x = 0.6  * x;
-                rx = 0.5 * rx;
+                rx = 0.6 * rx;
             }
             else if(gamepad1.left_bumper)
             {
@@ -61,7 +62,7 @@ public class Meet1 extends LinearOpMode {
                 x = 1.7  * x;
                 rx = 1.7 * rx;
             }
-            /*
+
             if(gamepad2.a)
             {
                 bool = true;
@@ -75,29 +76,28 @@ public class Meet1 extends LinearOpMode {
                 servo0.setPosition(0);
                 servo1.setPosition(1);
             }
-            else
-            {
+            else {
                 servo0.setPosition(1);
                 servo1.setPosition(0);
-
+            }
             // ReLEASE slide to drop claw.
 
             if(gamepad2.x)
             {
                 //slides.setPower(-0.95);
-                slides.setTargetPosition(100);
-                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(0.05);
+                slides.setPower(0.9);
 
             }
 
-            if(gamepad2.y){
-                slides.setTargetPosition(100);
-                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(0.05);
+            else if(gamepad2.y){
+                slides.setPower(-0.9);
 
             }
-            */
+            else {
+                slides.setPower(0);
+            }
+
+
 
 
 
@@ -134,11 +134,13 @@ public class Meet1 extends LinearOpMode {
 
             // Show the elapsed game time and wheel power
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //encoderValue = slides.getCurrentPosition();
-            //telemetry.addData("encoderVal", encoderValue);
 
-            telemetry.addData("input", x);
-            //telemetry.addData("Encoder value:", slides.getCurrentPosition());
+            telemetry.addData("encoderVal", slides.getCurrentPosition());
+
+            telemetry.addData("lf val:", motorFrontLeft.getCurrentPosition());
+            telemetry.addData("lr val:", motorBackLeft.getCurrentPosition());
+            telemetry.addData("rf val:", motorFrontRight.getCurrentPosition());
+            telemetry.addData("rr val:", motorBackRight.getCurrentPosition());
             telemetry.update();
         }
     }

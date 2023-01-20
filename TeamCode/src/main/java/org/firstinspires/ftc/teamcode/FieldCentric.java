@@ -68,9 +68,9 @@ public class FieldCentric extends LinearOpMode {
                     }
                     break;
             }
-            double y = 0.55 * -gamepad1.left_stick_y; // Remember, this is reversed!
+            double y = 0.55 * gamepad1.left_stick_y; // Remember, this is reversed!
             double x = 0.55 * gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-            double rx = 0.55 * gamepad1.right_stick_x;
+            double rx = -0.55 * gamepad1.right_stick_x;
             if(gamepad1.left_bumper)
             {
                 y = 1.77 * y;
