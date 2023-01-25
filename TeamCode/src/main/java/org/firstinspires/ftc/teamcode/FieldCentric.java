@@ -33,6 +33,7 @@ public class FieldCentric extends LinearOpMode {
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         double offset = 0;
         boolean bool = true;
+        double v = 0.85;
 
         // Reverse thv e right side motors
         // Reverse left motors if you are using NeveRests
@@ -55,21 +56,23 @@ public class FieldCentric extends LinearOpMode {
             switch (state){
                 case OPEN:
                     if(gamepad2.b){
-                        servo0.setPosition(0);
-                        servo1.setPosition(1);
+                        servo0.setPosition(0.4);
+                        servo1.setPosition(0.45);
                         state = lifestate.CLOSED;
                     }
                     break;
                 case CLOSED:
                     if(gamepad2.a){
-                        servo0.setPosition(0.2);
-                        servo1.setPosition(0.8);
+                        servo0.setPosition(0.9);
+                        servo1.setPosition(0);
                         state = lifestate.OPEN;
                     }
                     break;
+
+
             }
             double y = 0.55 * gamepad1.left_stick_y; // Remember, this is reversed!
-            double x = 0.55 * gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+            double x = -0.55 * gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
             double rx = -0.55 * gamepad1.right_stick_x;
             if(gamepad1.left_bumper)
             {
@@ -82,34 +85,49 @@ public class FieldCentric extends LinearOpMode {
                 y = 0.66 * y;
                 x = 0.66 * x;
                 rx = 0.66 * rx;
-                //hi this is a test
-                //next test
-
+            }
+            if(gamepad2.left_bumper)
+            {
+                v = 0.4;
+            }
+            else if(gamepad2.left_trigger > 0.5)
+            {
+                v = 0.2;
+            }
+            else
+            {
+                v = 0.85;
             }
             if(gamepad2.x)
             {
-                slides.setPower(0.95);
+                slides.setPower(v);
             }
             else if(gamepad2.y)
             {
-                slides.setPower(-0.95);
-            }
-            else
-            {
-                slides.setPower(0);
+                slides.setPower(-v);
             }
 
-            if(bool)
-            {
-                servo0.setPosition(0.2);
-                servo1.setPosition(0.8);
-            }
             else
             {
-                servo0.setPosition(1);
-                servo1.setPosition(0);
+                slides.setPower(-0.16);
             }
 
+
+           /*if(gamepad2.a)
+           {
+               bool != bool;
+           }
+
+           if(bool)
+           {
+               servo0.setPosition(0.2);
+               servo1.setPosition(0.8);
+           }
+           else
+           {
+               servo0.setPosition(1);
+               servo1.setPosition(0);
+           }*/
             double botHeading = -imu.getAngularOrientation().firstAngle;
             // Read inverse IMU heading, as the IMU heading is CW positive
             if(gamepad1.a)
@@ -139,9 +157,9 @@ public class FieldCentric extends LinearOpMode {
             motorBackRight.setPower(backRightPower);
             telemetry.addData("y speed:", y);
             telemetry.addData("x speed:", x);
-            telemetry.addData("left", gamepad1.left_bumper);
-            telemetry.addData("right1", gamepad1.right_bumper);
             telemetry.update();
         }
     }
 }
+
+

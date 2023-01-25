@@ -30,13 +30,13 @@ import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-
 import java.util.ArrayList;
 
-@Autonomous(name="Autonomous Blue", group="Cool Stuffs")
+@Autonomous(name="meet 3 auto", group="Cool Stuffs")
 public class AutonomousBlue extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
+
 
     static final double FEET_PER_METER = 3.28084;
 
@@ -85,8 +85,8 @@ public class AutonomousBlue extends LinearOpMode {
         motorFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
         //cam shit
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -149,20 +149,38 @@ public class AutonomousBlue extends LinearOpMode {
 
         if (opModeIsActive()) {
             if (tagNum == 1) {
-                // pos 1
-
-                motorBackLeft.setPower(-0.25);
-                motorFrontRight.setPower(-0.25);
-                motorBackRight.setPower(-0.25);
-                motorFrontLeft.setPower(-0.25);
-                sleep(2000);
+                servo0.setPosition(0.4);
+                servo1.setPosition(0.45);
                 motorBackLeft.setPower(-0.25);
                 motorFrontRight.setPower(-0.25);
                 motorBackRight.setPower(0.25);
                 motorFrontLeft.setPower(0.25);
-                sleep(1876);
+                sleep(2250);
+                motorBackLeft.setPower(-0.25);
+                motorFrontRight.setPower(-0.25);
+                motorBackRight.setPower(-0.25);
+                motorFrontLeft.setPower(-0.25);
+                sleep(2200);
 
+                // pos 1
                 /*
+                motorBackRight.setTargetPosition(200);
+                motorBackLeft.setTargetPosition(200);
+                motorFrontRight.setTargetPosition(200);
+                motorFrontLeft.setTargetPosition(200);
+                motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motorBackLeft.setPower(0.2);
+                motorFrontRight.setPower(0.2);
+                motorBackRight.setPower(0.2);
+                motorFrontLeft.setPower(0.2);
+                motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                //sleep(1876);
                 motorBackLeft.setTargetPosition(1000);
                 motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -181,17 +199,11 @@ public class AutonomousBlue extends LinearOpMode {
                 motorBackRight.setPower(0.1);
                 */
 
-
-
-
-
-
-
-
-
             }
             else if (tagNum == 2) {
                 // pos 2
+                servo0.setPosition(0.4);
+                servo1.setPosition(0.45);
                 motorBackLeft.setPower(-0.25);
                 motorFrontRight.setPower(-0.25);
                 motorBackRight.setPower(-0.25);
@@ -202,16 +214,19 @@ public class AutonomousBlue extends LinearOpMode {
             }
             else if (tagNum == 3) {
                 // pos 3
-                motorBackLeft.setPower(-0.25);
-                motorFrontRight.setPower(-0.25);
-                motorBackRight.setPower(-0.25);
-                motorFrontLeft.setPower(-0.25);
-                sleep(2000);
+                servo0.setPosition(0.4);
+                servo1.setPosition(0.45);
                 motorBackLeft.setPower(0.25);
                 motorFrontRight.setPower(0.25);
                 motorBackRight.setPower(-0.25);
                 motorFrontLeft.setPower(-0.25);
-                sleep(1825);
+                sleep(2200);
+                motorBackLeft.setPower(-0.25);
+                motorFrontRight.setPower(-0.25);
+                motorBackRight.setPower(-0.25);
+                motorFrontLeft.setPower(-0.25);
+                sleep(2250);
+
 
 
 

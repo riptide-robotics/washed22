@@ -24,8 +24,8 @@ public class Meet1 extends LinearOpMode {
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("rightFront");
         DcMotor motorBackRight = hardwareMap.dcMotor.get("rightRear");
         DcMotor slides = hardwareMap.dcMotor.get("slides");
-       Servo servo0 = hardwareMap.servo.get("servo0");
-       Servo servo1 = hardwareMap.servo.get("servo1");
+        Servo servo0 = hardwareMap.servo.get("servo0");
+        Servo servo1 = hardwareMap.servo.get("servo1");
        // int encoderValue = 0;
         boolean bool = false;
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -46,9 +46,9 @@ public class Meet1 extends LinearOpMode {
             return;
 
         while (opModeIsActive()) {
-            double y = gamepad1.left_stick_y * 0.47; // Remember, this is reversed!
+            double y = -gamepad1.left_stick_y * 0.47; // Remember, this is reversed!
             double x = gamepad1.left_stick_x * 1.1 * 0.47; // Counteract imperfect strafing
-            double rx = -gamepad1.right_stick_x * 0.47;
+            double rx = gamepad1.right_stick_x * 0.47;
 
             if(gamepad1.right_bumper)
             {
@@ -94,7 +94,7 @@ public class Meet1 extends LinearOpMode {
 
             }
             else {
-                slides.setPower(0);
+                slides.setPower(0.5);
             }
 
 
