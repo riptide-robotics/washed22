@@ -61,26 +61,22 @@ public class PidTesting extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         int integeralSum = 0;
         int lasterror = 0;
-
-        if(gamepad2.x)
-        {
-            while(slides.getCurrentPosition() <= 500)
-            {
-                int encoderPos = slides.getCurrentPosition();
-                int error = reference - encoderPos;
-                double derivative = (error - lasterror) / timer.seconds();
-                integeralSum += (error * timer.seconds());
-                double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
-                slides.setPower(out);
-                lasterror = error;
-                timer.reset();
+        while (opModeIsActive()) {
+            if (gamepad2.x) {
+                while (slides.getCurrentPosition() <= 500) {
+                    int encoderPos = slides.getCurrentPosition();
+                    int error = reference - encoderPos;
+                    double derivative = (error - lasterror) / timer.seconds();
+                    integeralSum += (error * timer.seconds());
+                    double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
+                    slides.setPower(out);
+                    lasterror = error;
+                    timer.reset();
+                }
+                slides.setPower(0.95);
+            } else {
+                slides.setPower(0);
             }
-            slides.setPower(0.95);
-        }
-
-        else
-        {
-            slides.setPower(0);
         }
         //sorry my bad2
 
