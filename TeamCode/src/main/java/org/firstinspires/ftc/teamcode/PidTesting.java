@@ -53,7 +53,7 @@ public class PidTesting extends LinearOpMode {
 
 
 
-        int kp = 1;
+        int kp = 0;
         int ki = 0;
         int kd = 0;
 
