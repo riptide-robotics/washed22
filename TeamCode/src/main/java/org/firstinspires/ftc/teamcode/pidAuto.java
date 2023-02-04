@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
-public class PidTesting extends LinearOpMode {
+public class pidAuto extends LinearOpMode {
     ElapsedTime clawPos = new ElapsedTime();
 
     public enum lifestate{
@@ -61,8 +61,9 @@ public class PidTesting extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         int integeralSum = 0;
         int lasterror = 0;
-        while (opModeIsActive()) {
-            if (gamepad2.x) {
+        if (opModeIsActive()) {
+            telemetry.addData("encoder val:", slides.getCurrentPosition());
+            telemetry.update();
                 while (slides.getCurrentPosition() <= 500) {
                     int encoderPos = slides.getCurrentPosition();
                     int error = reference - encoderPos;
@@ -73,9 +74,6 @@ public class PidTesting extends LinearOpMode {
                     lasterror = error;
                     timer.reset();
                 }
-                slides.setPower(0.95);
-            } else {
-                slides.setPower(0);
             }
         }
         //sorry my bad2
@@ -83,11 +81,8 @@ public class PidTesting extends LinearOpMode {
 
         // Read inverse IMU heading, as the IMU heading is CW positive
 
-        telemetry.addData("left", gamepad1.left_bumper);
-        telemetry.addData("right1", gamepad1.right_bumper);
-        telemetry.addData("encoder position:", slides.getCurrentPosition());
-        telemetry.update();
+
     }
-}
+//}
 
 
