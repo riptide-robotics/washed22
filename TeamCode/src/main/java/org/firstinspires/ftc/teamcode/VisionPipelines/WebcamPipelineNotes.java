@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.VisionPipelines;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -23,6 +23,7 @@ public class WebcamPipelineNotes extends OpenCvPipeline {
 
     Scalar RED = new Scalar(255.0, 0.0, 0.0);
 
+    Telemetry telemetry;
 
     //This happens when you call the pipeline with the frame
     @Override
@@ -30,7 +31,6 @@ public class WebcamPipelineNotes extends OpenCvPipeline {
     {
         // subMats are a small portion of the mat in this case you make a subMat of
         // starting from x:0 to x:500, and y:0 to y:500
-        subMat = firstFrame.submat(0,500,0,500);
     }
 
     // you process the frame
@@ -71,11 +71,11 @@ public class WebcamPipelineNotes extends OpenCvPipeline {
         // Simple comparisons.
         if (LEFTAVG > RIGHTAVG)
         {
-            telemetry.addLine("Left");
+            telemetry.addData("[Cool!]","Left");
         }
         else
         {
-            telemetry.addLine("Right");
+            telemetry.addData("This is amazing", "Right");
         }
 
 
