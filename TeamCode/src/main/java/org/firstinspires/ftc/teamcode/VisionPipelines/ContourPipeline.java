@@ -21,7 +21,7 @@ public class ContourPipeline extends OpenCvPipeline {
     public Scalar upper = new Scalar(255, 255, 255);
 
 
-    private final Mat ycrcbMat       = new Mat();
+    private final Mat ycrcbMat = new Mat();
     private Mat binaryMat      = new Mat();
     private Mat maskedInputMat = new Mat();
     private Mat grayscaleMat   = new Mat();
@@ -37,9 +37,6 @@ public class ContourPipeline extends OpenCvPipeline {
 
     private Mat edgeDetectorFrame = new Mat();
     private boolean onlycontours = false;
-
-
-
 
 
     @Override
@@ -83,7 +80,7 @@ public class ContourPipeline extends OpenCvPipeline {
         for (int i = 0; i < contours.size(); i++) {
             contoursPoly[i] = new MatOfPoint2f();
             Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly[i], 3, true);
-            boundRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly[i].toArray()));
+            boundRect[i] = Imgproc.boundingRect(contours.get(i));
             centers[i] = new Point();
         }
 
@@ -102,6 +99,10 @@ public class ContourPipeline extends OpenCvPipeline {
 
         Mat activeMat;
         Mat emptyMat = Mat.zeros(edgeDetectorFrame.size(), CvType.CV_8UC3);
+        double largestArea = 0;
+        int index = 0;
+        double contourArea;
+
 
         if (onlycontours)
         {
@@ -113,30 +114,48 @@ public class ContourPipeline extends OpenCvPipeline {
         }
 
 
+
         for (int i = 0; i < contours.size(); i++) {
 
             MatOfPoint contour = contours.get(i);
-            double contourArea = Imgproc.contourArea(contour);
+
+            contourArea = Imgproc.contourArea(contour);
 
             // A simple filter I cam up with ;P
+            //
             if (contourArea < noiseSensitivity)
             {
                 continue;
             }
 
-            // Adding Text
+            if (contourArea > largestArea)
+            {
+                largestArea = contourArea;
+                index = i;
+            }
+
+        }
+
+        if (contours.size() != 0 && largestArea != 0)
+        {
+            // Adding Text3
             Imgproc.putText (
                     activeMat,                          // Matrix obj of the image
-                    contourArea + "",          // Text to be added
-                    new Point(10, 50),               // point
+                    largestArea + "",          // Text to be added
+                    new Point(boundRect[index].tl().x, boundRect[index].tl().y),               // point
                     Imgproc.FONT_HERSHEY_SIMPLEX ,      // front face
                     1,                               // front scale
                     contourColors,             // Scalar object for color
-                    4                                // Thickness
+                    2                               // Thickness
             );
-            Imgproc.drawContours(activeMat, contoursPolyList, i, contourColors, contourSize);
-            Imgproc.rectangle(activeMat, boundRect[i].tl(), boundRect[i].br(), contourColors, 2);
+            Imgproc.drawContours(activeMat, contoursPolyList, index, contourColors, contourSize);
+            Imgproc.rectangle(activeMat, boundRect[index].tl(), boundRect[index].br(), contourColors, 2);
+
         }
+
+
+
+
         return activeMat;
     }
 
