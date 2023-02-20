@@ -14,8 +14,20 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+
+
+
+
 
 public class ContourPipeline extends OpenCvPipeline {
+
+    Telemetry telemetry;
+
+    public ContourPipeline(Telemetry telemetry) {
+        this.telemetry = telemetry;
+    }
 
     public Scalar lower = new Scalar(0, 160.1, 0);
     public Scalar upper = new Scalar(255, 255, 255);
@@ -38,9 +50,14 @@ public class ContourPipeline extends OpenCvPipeline {
     private Mat edgeDetectorFrame = new Mat();
     private boolean onlycontours = false;
 
+    double largestArea = 0;
+
 
     @Override
     public Mat processFrame(Mat input) {
+
+        telemetry.addData("[greeting]", "Hello!");
+
          //Takes our "input" mat as an input, and outputs to a separate Mat buffer "ycrcbMat"
         Imgproc.cvtColor(input, ycrcbMat, Imgproc.COLOR_RGB2YCrCb);
 
@@ -99,7 +116,6 @@ public class ContourPipeline extends OpenCvPipeline {
 
         Mat activeMat;
         Mat emptyMat = Mat.zeros(edgeDetectorFrame.size(), CvType.CV_8UC3);
-        double largestArea = 0;
         int index = 0;
         double contourArea;
 
@@ -154,9 +170,14 @@ public class ContourPipeline extends OpenCvPipeline {
         }
 
 
-
+        telemetry.update();
 
         return activeMat;
+    }
+
+    public double getLargestSize()
+    {
+        return largestArea;
     }
 
 
@@ -165,7 +186,5 @@ public class ContourPipeline extends OpenCvPipeline {
     {
         onlycontours = !onlycontours;
     }
-
-
 
 }
