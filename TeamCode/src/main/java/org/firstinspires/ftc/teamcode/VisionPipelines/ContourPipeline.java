@@ -14,7 +14,6 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
 
@@ -23,20 +22,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class ContourPipeline extends OpenCvPipeline {
 
-    Telemetry telemetry;
-
-    public ContourPipeline(Telemetry telemetry) {
-        this.telemetry = telemetry;
-    }
-
     public Scalar lower = new Scalar(0, 160.1, 0);
     public Scalar upper = new Scalar(255, 255, 255);
 
 
-    private final Mat ycrcbMat = new Mat();
-    private Mat binaryMat      = new Mat();
-    private Mat maskedInputMat = new Mat();
-    private Mat grayscaleMat   = new Mat();
+    private final Mat ycrcbmat = new Mat();
+    private final Mat binaryMat      = new Mat();
+    private final Mat maskedInputMat = new Mat();
+    private final Mat grayscaleMat   = new Mat();
 
     // Contour Vars
 
@@ -47,8 +40,8 @@ public class ContourPipeline extends OpenCvPipeline {
     public double noiseSensitivity = 153;
     public int contourSize = 1;
 
-    private Mat edgeDetectorFrame = new Mat();
-    private int onlycontours = 1;
+    private final Mat edgeDetectorFrame = new Mat();
+    private int onlyContours = 1;
 
     private double currentLargest = 0;
 
@@ -57,13 +50,12 @@ public class ContourPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
 
-        telemetry.addData("[greeting]", "Hello!");
 
          //Takes our "input" mat as an input, and outputs to a separate Mat buffer "ycrcbMat"
-        Imgproc.cvtColor(input, ycrcbMat, Imgproc.COLOR_RGB2YCrCb);
+        Imgproc.cvtColor(input, ycrcbmat, Imgproc.COLOR_RGB2YCrCb);
 
-         //Order is source, lowerbound, upperbound, dst.
-        Core.inRange(ycrcbMat, lower, upper, binaryMat);
+         //Order is source, lowerBound, upperbound, dst.
+        Core.inRange(ycrcbmat, lower, upper, binaryMat);
 
         /*
          * Release the reusable Mat so that old data doesn't
@@ -92,14 +84,14 @@ public class ContourPipeline extends OpenCvPipeline {
 
         Rect[] boundRect = new Rect[contours.size()];
         //Might be useful later, idk so I am going to leave this here
-        Point[] centers = new Point[contours.size()];
+        //Point[] centers = new Point[contours.size()];
 
 
         for (int i = 0; i < contours.size(); i++) {
             contoursPoly[i] = new MatOfPoint2f();
             Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly[i], 3, true);
             boundRect[i] = Imgproc.boundingRect(contours.get(i));
-            centers[i] = new Point();
+            //centers[i] = new Point();
         }
 
 
@@ -122,11 +114,11 @@ public class ContourPipeline extends OpenCvPipeline {
         double largestArea = 0;
 
 
-        if (onlycontours == 1)
+        if (onlyContours == 1)
         {
             activeMat = maskedInputMat;
         }
-        else if (onlycontours == 2)
+        else if (onlyContours == 2)
         {
             activeMat = emptyMat;
         }
@@ -174,8 +166,6 @@ public class ContourPipeline extends OpenCvPipeline {
 
         }
 
-        telemetry.update();
-
         return activeMat;
     }
 
@@ -188,14 +178,10 @@ public class ContourPipeline extends OpenCvPipeline {
     @Override
     public void onViewportTapped()
     {
-        if (onlycontours == 1 || onlycontours == 2)
-        {
-            onlycontours++;
-        }
+        if (onlyContours == 1 || onlyContours == 2)
+            onlyContours++;
         else
-        {
-            onlycontours = 1;
-        }
+            onlyContours = 1;
     }
 
 }
