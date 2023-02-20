@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -10,17 +11,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 public class PidTesting extends LinearOpMode {
-    ElapsedTime clawPos = new ElapsedTime();
 
-    public enum lifestate{
-        OPEN,
-        CLOSED
-    }
-    lifestate state = lifestate.OPEN;
+
+
 
     @Override
     public void runOpMode() throws InterruptedException {
-        clawPos.reset();
         // Declare our motors
         // Make sure your ID's match your configuration
        /*DcMotor motorFrontLeft = hardwareMap.dcMotor.get("leftFront");
@@ -28,6 +24,8 @@ public class PidTesting extends LinearOpMode {
        DcMotor motorFrontRight = hardwareMap.dcMotor.get("rightFront");
        DcMotor motorBackRight = hardwareMap.dcMotor.get("rightRear");*/
         DcMotor slides = hardwareMap.dcMotor.get("slides");
+        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
        /*Servo servo0 = hardwareMap.servo.get("servo0");
        Servo servo1 = hardwareMap.servo.get("servo1");
        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);/*/
@@ -53,40 +51,41 @@ public class PidTesting extends LinearOpMode {
 
 
 
-        int kp = 0;
-        int ki = 0;
-        int kd = 0;
+        double kp = 0.1;
+        double ki = 0;
+        double kd = 0.1;
 
         int reference = 500;
         ElapsedTime timer = new ElapsedTime();
-        int integeralSum = 0;
-        int lasterror = 0;
+        double integeralSum = 0;
+        double lasterror = 0;
         while (opModeIsActive()) {
             if (gamepad2.x) {
-                while (slides.getCurrentPosition() <= 500) {
-                    int encoderPos = slides.getCurrentPosition();
-                    int error = reference - encoderPos;
+                while (slides.getCurrentPosition() <= 1000) {
+                    double encoderPos = slides.getCurrentPosition();
+                    double error = reference - encoderPos;
                     double derivative = (error - lasterror) / timer.seconds();
                     integeralSum += (error * timer.seconds());
                     double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
                     slides.setPower(out);
+                    telemetry.addData("encoder position:", slides.getCurrentPosition());
+                    telemetry.addData("output power:", out);
+                    telemetry.addData("x?", gamepad2.x);
+                    telemetry.update();
                     lasterror = error;
                     timer.reset();
                 }
-                slides.setPower(0.95);
-            } else {
-                slides.setPower(0);
+            }
+            if(gamepad2.y)
+            {
+                slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
         }
         //sorry my bad2
 
 
         // Read inverse IMU heading, as the IMU heading is CW positive
-
-        telemetry.addData("left", gamepad1.left_bumper);
-        telemetry.addData("right1", gamepad1.right_bumper);
-        telemetry.addData("encoder position:", slides.getCurrentPosition());
-        telemetry.update();
     }
 }
 
