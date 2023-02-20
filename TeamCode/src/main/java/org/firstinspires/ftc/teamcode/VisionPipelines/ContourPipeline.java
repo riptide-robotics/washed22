@@ -48,9 +48,10 @@ public class ContourPipeline extends OpenCvPipeline {
     public int contourSize = 1;
 
     private Mat edgeDetectorFrame = new Mat();
-    private boolean onlycontours = false;
+    private int onlycontours = 1;
 
-    double largestArea = 0;
+    private double currentLargest = 0;
+
 
 
     @Override
@@ -118,18 +119,20 @@ public class ContourPipeline extends OpenCvPipeline {
         Mat emptyMat = Mat.zeros(edgeDetectorFrame.size(), CvType.CV_8UC3);
         int index = 0;
         double contourArea;
+        double largestArea = 0;
 
 
-        if (onlycontours)
-        {
-            activeMat = emptyMat;
-        }
-        else
+        if (onlycontours == 1)
         {
             activeMat = maskedInputMat;
         }
-
-
+        else if (onlycontours == 2)
+        {
+            activeMat = emptyMat;
+        }
+        else {
+            activeMat = input;
+        }
 
         for (int i = 0; i < contours.size(); i++) {
 
@@ -152,6 +155,8 @@ public class ContourPipeline extends OpenCvPipeline {
 
         }
 
+        currentLargest = largestArea;
+
         if (contours.size() != 0 && largestArea != 0)
         {
             // Adding Text3
@@ -169,7 +174,6 @@ public class ContourPipeline extends OpenCvPipeline {
 
         }
 
-
         telemetry.update();
 
         return activeMat;
@@ -177,14 +181,21 @@ public class ContourPipeline extends OpenCvPipeline {
 
     public double getLargestSize()
     {
-        return largestArea;
+        return currentLargest;
     }
 
 
     @Override
     public void onViewportTapped()
     {
-        onlycontours = !onlycontours;
+        if (onlycontours == 1 || onlycontours == 2)
+        {
+            onlycontours++;
+        }
+        else
+        {
+            onlycontours = 1;
+        }
     }
 
 }
