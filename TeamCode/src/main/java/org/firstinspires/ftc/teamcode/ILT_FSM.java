@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -7,36 +8,53 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.VisionPipelines.ContourPipeline;
-import org.firstinspires.ftc.teamcode.VisionPipelines.WebcamPipelineNotes;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @TeleOp(name = "ILTFINAL", group = "linear opmode")
+
+@Config
 public class ILT_FSM extends LinearOpMode {
+
+    //Consts, these consts right now are crude, as we don't have a bot rn ;-;
+    public static int SLIDES_MAX_LENGTH = 100;
+    public static double MOTOR_POWER = 0.5;
+    public static double SMALLEST_CONE_THRESH = 1000.0;
+    public static double LARGEST_CONE_THRESH = 2000.0;
+
+
     OpenCvWebcam camera = null;
+    // I won't touch this but ?? what's this lmao
     ElapsedTime iltBotStuff = new ElapsedTime();
 
+
+    // The "States" for the finite state Machine, also known as FSM from now
     public enum cycle{
+        SWEEP,
         START,
         EXTENDEDHOR,
         GRABCONE,
         RETRACTHORVER,
-        TRANFER,
-        EXTENDHORVER,
+        TRANSFER,
+        EXTEND_HOR_VER,
         DEPOSITCONE,
+
+
 
     }
     cycle cycling = cycle.START;
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+        // This is the only time that we use this lmao what
         iltBotStuff.reset();
-        // Declare our motors
-        // Make sure your ID's match your configuration
+
         WebcamName webcamname = hardwareMap.get(WebcamName.class, "Webcam");
         // Acquire the camera ID
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName() );
@@ -55,6 +73,9 @@ public class ILT_FSM extends LinearOpMode {
             }
         });
 
+
+        // Declare our motors
+        // Make sure your ID's match your configuration
         DcMotor motorFrontLeft = hardwareMap.dcMotor.get("leftFront");
         DcMotor motorBackLeft = hardwareMap.dcMotor.get("leftRear");
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("rightFront");
@@ -71,6 +92,8 @@ public class ILT_FSM extends LinearOpMode {
         Servo clawServo = hardwareMap.servo.get("servo4");
         Servo clawServo2 = hardwareMap.servo.get("servo5");
         Servo claw = hardwareMap.servo.get("servo6");
+
+
         leftHoriz.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightHoriz.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftVert.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -78,8 +101,7 @@ public class ILT_FSM extends LinearOpMode {
         double offset = 0;
 
 
-
-        // Reverse thv e right side motors
+        // Reverse the right side motors
         // Reverse left motors if you are using NeveRests
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -98,168 +120,142 @@ public class ILT_FSM extends LinearOpMode {
 
         while (opModeIsActive()) {
             switch (cycling){
-                case START:
-                    if(gamepad2.dpad_up){
-                        while (!gamepad2.dpad_left) {
-                            if(gamepad2.dpad_left){
-                                cycling = cycle.START;
-                                break;
-                            }
-                            if (leftHoriz.getCurrentPosition() < 100 && rightHoriz.getCurrentPosition() < 100) {
-                                leftHoriz.setTargetPosition(100);
-                                rightHoriz.setTargetPosition(100);
-                                leftHoriz.setPower(0.5);
-                                rightHoriz.setPower(0.5);
-                                if(gamepad2.dpad_left){
-                                    cycling = cycle.START;
-                                    break;
-                                }
-
-                            }
-                            if(gamepad2.dpad_left){
-                                break;
-                            }
-                            cycling = cycle.EXTENDEDHOR;
-                        }
-
+                case SWEEP:
+                    if (!gamepad2.dpad_up)
+                    {
+                        break;
                     }
-                    break;
-                case EXTENDEDHOR:
-                    double lc = ContourPipeline.getLargestSize();
-                    while (!gamepad2.dpad_left) {
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
-                            break;
-                        }
-                        if ((lc < 2000 && lc > 1000) || leftHoriz.getCurrentPosition() <= 100) {
+
+                    while (!gamepad1.dpad_left && leftHoriz.getCurrentPosition() <  SLIDES_MAX_LENGTH )
+                    {
+                        double latestContour = ContourPipeline.getLargestSize();
+                        if (latestContour > SMALLEST_CONE_THRESH && latestContour < LARGEST_CONE_THRESH) {
                             claw.setPosition(1);
+                            leftHoriz.setTargetPosition(leftHoriz.getCurrentPosition());
+                            rightHoriz.setTargetPosition(rightHoriz.getCurrentPosition());
                             cycling = cycle.GRABCONE;
-                        }
-                        else{
-                            cycling = cycle.START;
-                        }
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
                             break;
                         }
+                        /*
+                        The setTargetPosition from here and on is temperary, we are implementing PID loops
+
+                        how the PID loop will work is this
+
+                        Check if the cone is in range, ( already done from line 125 to 130)
+                        if cone is in range, then set target position is
+                        Set target position to MAX_RANGE note that max range is a little less than the actual max range
+                        start moving. This way we can stop the PID loop on its way to the max and we avoid juttering too much.
+                         */
+
+                        leftHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
+                        rightHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
+                        leftHoriz.setPower(MOTOR_POWER);
+                        rightHoriz.setPower(MOTOR_POWER);
 
                     }
 
                     break;
+
                 case GRABCONE:
-                    while (!gamepad2.dpad_left) {
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
-                            break;
-                        }
-                        if ((leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0)) {
-                            leftVert.setTargetPosition(0);
-                            rightVert.setTargetPosition(0);
-                            leftVert.setPower(-0.5);
-                            rightVert.setPower(-0.5);
-                            leftHoriz.setTargetPosition(0);
-                            rightHoriz.setTargetPosition(0);
-                            leftHoriz.setPower(-0.5);
-                            rightHoriz.setPower(-0.5);
-                            cycling = cycle.EXTENDHORVER;
-                        }
-                        else if(leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0){
-                            leftHoriz.setTargetPosition(0);
-                            rightHoriz.setTargetPosition(0);
-                            leftHoriz.setPower(-0.5);
-                            rightHoriz.setPower(-0.5);
-                            cycling = cycle.RETRACTHORVER;
-                        }
-                        else{
-                            cycling = cycle.EXTENDEDHOR;
-                        }
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
-                            break;
-                        }
+                    if(gamepad2.dpad_left){
+                        cycling = cycle.START;
+                        break;
+                    }
+                    if ((leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0)) {
+                        leftVert.setTargetPosition(0);
+                        rightVert.setTargetPosition(0);
+                        leftVert.setPower(-MOTOR_POWER);
+
+                        rightVert.setPower(-MOTOR_POWER);
+                        leftHoriz.setTargetPosition(0);
+                        rightHoriz.setTargetPosition(0);
+                        leftHoriz.setPower(-MOTOR_POWER);
+                        rightHoriz.setPower(-MOTOR_POWER);
+                        cycling = cycle.EXTEND_HOR_VER;
+                    }
+                    else if(leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0)
+                    {
+                        leftHoriz.setTargetPosition(0);
+                        rightHoriz.setTargetPosition(0);
+                        leftHoriz.setPower(-MOTOR_POWER);
+                        rightHoriz.setPower(-MOTOR_POWER);
+                        cycling = cycle.RETRACTHORVER;
+                    }
+                    else{
+                        cycling = cycle.EXTENDEDHOR;
                     }
 
                     break;
 
-                case TRANFER:
-                    while(!gamepad2.dpad_left) {
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
-                            break;
-                        }
-                        if (leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0 && armServo.getPosition() == 1) {
+                case TRANSFER:
+
+                    if(gamepad2.dpad_left){
+                        cycling = cycle.START;
+                        break;
+                    }
+                    if (leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0 && armServo.getPosition() == 1) {
                             armServo.setPosition(0);
                             armServo.setPosition(1);
                             clawServo.setPosition(0);
                             clawServo2.setPosition(1);
                             claw.setPosition(0);
-                            cycling = cycle.EXTENDHORVER;
+                            cycling = cycle.EXTEND_HOR_VER;
                         }
                         else {
                             cycling = cycle.GRABCONE;
                         }
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
-                            break;
-                        }
 
+                    break;
+                case EXTEND_HOR_VER:
+                    if(gamepad2.dpad_left){
+                        cycling = cycle.START;
+                        break;
+                    }
+
+                    if (armServo.getPosition() == 0 && leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0) {
+                        leftVert.setTargetPosition(SLIDES_MAX_LENGTH);
+                        rightVert.setTargetPosition(SLIDES_MAX_LENGTH);
+                        leftVert.setPower(MOTOR_POWER);
+                        rightVert.setPower(MOTOR_POWER);
+                        leftHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
+                        rightHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
+                        leftHoriz.setPower(MOTOR_POWER);
+                        rightHoriz.setPower(MOTOR_POWER);
+                        armServo.setPosition(1);
+                        armServo2.setPosition(0);
+                        clawServo.setPosition(1);
+                        clawServo2.setPosition(0);
+                        cycling = cycle.DEPOSITCONE;
+                    }
+                    else
+                    {
+                        cycling = cycle.GRABCONE;
                     }
                     break;
-                case EXTENDHORVER:
-                    while (!gamepad2.dpad_left) {
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
-                            break;
-                        }
-                        if (armServo.getPosition() == 0 && leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0) {
-                            leftVert.setTargetPosition(100);
-                            rightVert.setTargetPosition(100);
-                            leftVert.setPower(0.5);
-                            rightVert.setPower(0.5);
-                            leftHoriz.setTargetPosition(100);
-                            rightHoriz.setTargetPosition(100);
-                            leftHoriz.setPower(0.5);
-                            rightHoriz.setPower(0.5);
-                            armServo.setPosition(1);
-                            armServo2.setPosition(0);
-                            clawServo.setPosition(1);
-                            clawServo2.setPosition(0);
-                            cycling = cycle.DEPOSITCONE;
-                        } else {
-                            cycling = cycle.GRABCONE;
-                        }
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
-                            break;
-                        }
-                    }
-                    break;
+
                 case DEPOSITCONE:
-                    while ((!gamepad2.dpad_left)) {
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
-                            break;
-                        }
-                        if (armServo.getPosition() == 0 && leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0) {
-                            vertServo.setPosition(1);
-                            vertServo2.setPosition(0);
-                            sleep(50);
-                            vertServo.setPosition(0);
-                            vertServo2.setPosition(1);
-                            leftVert.setTargetPosition(0);
-                            rightVert.setTargetPosition(0);
-                            leftVert.setPower(-0.5);
-                            rightVert.setPower(-0.5);
-                            cycling = cycle.START;
-                        } else {
-                            cycling = cycle.EXTENDHORVER;
-                        }
-                        if(gamepad2.dpad_left){
-                            cycling = cycle.START;
-                            break;
-                        }
 
+                    if(gamepad2.dpad_left){
+                        cycling = cycle.START;
+                        break;
                     }
+                    if (armServo.getPosition() == 0 && leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0) {
+                        vertServo.setPosition(1);
+                        vertServo2.setPosition(0);
+                        sleep(50);
+                        vertServo.setPosition(0);
+                        vertServo2.setPosition(1);
+                        leftVert.setTargetPosition(0);
+                        rightVert.setTargetPosition(0);
+                        leftVert.setPower(-MOTOR_POWER);
+                        rightVert.setPower(-MOTOR_POWER);
+                        cycling = cycle.START;
+                    }
+                    else
+                    {
+                        cycling = cycle.EXTEND_HOR_VER;
+                    }
+
                     break;
 
             }
