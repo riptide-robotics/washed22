@@ -43,7 +43,7 @@ public class ContourPipeline extends OpenCvPipeline {
     private final Mat edgeDetectorFrame = new Mat();
     private int onlyContours = 1;
 
-    private double currentLargest = 0;
+    private static double currentLargest = 0;
 
 
 
@@ -169,7 +169,7 @@ public class ContourPipeline extends OpenCvPipeline {
         return activeMat;
     }
 
-    public double getLargestSize()
+    public static double getLargestSize()
     {
         return currentLargest;
     }

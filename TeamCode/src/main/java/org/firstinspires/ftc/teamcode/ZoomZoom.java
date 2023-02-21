@@ -10,20 +10,28 @@ import com.qualcomm.robotcore.hardware.*;
 // blah blah blah
 
 
-@TeleOp(name="movement teleop", group="Linear Opmode")
+@TeleOp(name="calibration testing", group="Linear Opmode")
 // decorator so the robot knows what mode to operate in
 @Config
 public class ZoomZoom extends LinearOpMode {
     // Declare teleOp members.
     private ElapsedTime runtime = new ElapsedTime();
-    public static double positionTracker = 0;
+    public static double out = 0.5;
+    public static double arm = 0.5;
+    public static double wrist = 0.5;
+    public static double claw = 0.5;
 
     @Override
     // related to inheritance: runOpMode is a necessary function as you NEED to override the runOpMode in the superclass
     public void runOpMode() {
         //System.out on the phones = telemetry
-        Servo servo0 = hardwareMap.servo.get("servo0");
-        Servo servo1 = hardwareMap.servo.get("servo1");
+        Servo servo0 = hardwareMap.servo.get("servo0out");
+        Servo servo1 = hardwareMap.servo.get("servo1out");
+        Servo servo2 = hardwareMap.servo.get("servo2arm");
+        Servo servo3 = hardwareMap.servo.get("servo3arm");
+        Servo servo4 = hardwareMap.servo.get("servo4wrist");
+        Servo servo5 = hardwareMap.servo.get("servo5wrist");
+        Servo servo6 = hardwareMap.servo.get("servo6claw");
         // int encoderValue = 0;
         boolean bool = false;
 
@@ -47,8 +55,13 @@ public class ZoomZoom extends LinearOpMode {
             double x = gamepad1.left_stick_x * 1.1 * 0.47; // Counteract imperfect strafing
             double rx = gamepad1.right_stick_x * 0.47;
 
-            servo0.setPosition(positionTracker);
-            servo1.setPosition(1 - positionTracker);
+            servo0.setPosition(out);
+            servo1.setPosition(1 - out);
+            servo2.setPosition(arm);
+            servo3.setPosition(1-arm);
+            servo4.setPosition(wrist);
+            servo5.setPosition(1-wrist);
+            servo6.setPosition(claw);
             // ReLEASE slide to drop claw.
 
 
@@ -80,7 +93,7 @@ public class ZoomZoom extends LinearOpMode {
 
 
             // Show the elapsed game time and wheel power
-            telemetry.addData("Position Tracker", positionTracker);
+
 
 
 
