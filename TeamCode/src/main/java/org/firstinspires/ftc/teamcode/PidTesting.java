@@ -73,6 +73,7 @@ public class PidTesting extends LinearOpMode {
                     integeralSum += (error * timer.seconds());
                     double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
                     slides.setPower(out);
+                    slides2.setPower(-out);
                     telemetry.addData("encoder position:", slides.getCurrentPosition());
                     telemetry.addData("output power:", out);
                     telemetry.addData("x?", gamepad2.x);
@@ -80,20 +81,7 @@ public class PidTesting extends LinearOpMode {
                     lasterror = error;
                     timer.reset();
                 }
-                while (slides2.getCurrentPosition() >= -100) {
-                    double encoderPos = slides.getCurrentPosition();
-                    double error = reference - encoderPos;
-                    double derivative = (error - lasterror) / timer.seconds();
-                    integeralSum2 += (error * timer.seconds());
-                    double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
-                    slides.setPower(out);
-                    telemetry.addData("encoder position:", slides.getCurrentPosition());
-                    telemetry.addData("output power:", out);
-                    telemetry.addData("x?", gamepad2.x);
-                    telemetry.update();
-                    lasterror2 = error;
-                    timer.reset();
-                }
+
             }
             if(gamepad2.y)
             {
