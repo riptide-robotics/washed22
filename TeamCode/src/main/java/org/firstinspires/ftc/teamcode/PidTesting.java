@@ -26,6 +26,9 @@ public class PidTesting extends LinearOpMode {
         DcMotor slides = hardwareMap.dcMotor.get("slides");
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        DcMotor slides2 = hardwareMap.dcMotor.get("slides2");
+        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
        /*Servo servo0 = hardwareMap.servo.get("servo0");
        Servo servo1 = hardwareMap.servo.get("servo1");
        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);/*/
@@ -59,9 +62,11 @@ public class PidTesting extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         double integeralSum = 0;
         double lasterror = 0;
+        double integeralSum2 = 0;
+        double lasterror2 = 0;
         while (opModeIsActive()) {
             if (gamepad2.x) {
-                while (slides.getCurrentPosition() <= 1000) {
+                while (slides.getCurrentPosition() <= 100) {
                     double encoderPos = slides.getCurrentPosition();
                     double error = reference - encoderPos;
                     double derivative = (error - lasterror) / timer.seconds();
@@ -73,6 +78,20 @@ public class PidTesting extends LinearOpMode {
                     telemetry.addData("x?", gamepad2.x);
                     telemetry.update();
                     lasterror = error;
+                    timer.reset();
+                }
+                while (slides2.getCurrentPosition() >= -100) {
+                    double encoderPos = slides.getCurrentPosition();
+                    double error = reference - encoderPos;
+                    double derivative = (error - lasterror) / timer.seconds();
+                    integeralSum2 += (error * timer.seconds());
+                    double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
+                    slides.setPower(out);
+                    telemetry.addData("encoder position:", slides.getCurrentPosition());
+                    telemetry.addData("output power:", out);
+                    telemetry.addData("x?", gamepad2.x);
+                    telemetry.update();
+                    lasterror2 = error;
                     timer.reset();
                 }
             }

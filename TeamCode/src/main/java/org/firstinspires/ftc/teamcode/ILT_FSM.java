@@ -36,8 +36,6 @@ public class ILT_FSM extends LinearOpMode {
     // The "States" for the finite state Machine, also known as FSM from now
     public enum cycle{
         SWEEP,
-        START,
-        EXTENDEDHOR,
         GRABCONE,
         RETRACTHORVER,
         TRANSFER,
@@ -47,7 +45,7 @@ public class ILT_FSM extends LinearOpMode {
 
 
     }
-    cycle cycling = cycle.START;
+    cycle cycling = cycle.SWEEP;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -158,7 +156,7 @@ public class ILT_FSM extends LinearOpMode {
 
                 case GRABCONE:
                     if(gamepad2.dpad_left){
-                        cycling = cycle.START;
+                        cycling = cycle.SWEEP;
                         break;
                     }
                     if ((leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0)) {
@@ -182,7 +180,7 @@ public class ILT_FSM extends LinearOpMode {
                         cycling = cycle.RETRACTHORVER;
                     }
                     else{
-                        cycling = cycle.EXTENDEDHOR;
+                        cycling = cycle.SWEEP;
                     }
 
                     break;
@@ -190,7 +188,7 @@ public class ILT_FSM extends LinearOpMode {
                 case TRANSFER:
 
                     if(gamepad2.dpad_left){
-                        cycling = cycle.START;
+                        cycling = cycle.SWEEP;
                         break;
                     }
                     if (leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0 && armServo.getPosition() == 1) {
@@ -208,7 +206,7 @@ public class ILT_FSM extends LinearOpMode {
                     break;
                 case EXTEND_HOR_VER:
                     if(gamepad2.dpad_left){
-                        cycling = cycle.START;
+                        cycling = cycle.SWEEP;
                         break;
                     }
 
@@ -236,7 +234,7 @@ public class ILT_FSM extends LinearOpMode {
                 case DEPOSITCONE:
 
                     if(gamepad2.dpad_left){
-                        cycling = cycle.START;
+                        cycling = cycle.SWEEP;
                         break;
                     }
                     if (armServo.getPosition() == 0 && leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0) {
@@ -249,7 +247,7 @@ public class ILT_FSM extends LinearOpMode {
                         rightVert.setTargetPosition(0);
                         leftVert.setPower(-MOTOR_POWER);
                         rightVert.setPower(-MOTOR_POWER);
-                        cycling = cycle.START;
+                        cycling = cycle.SWEEP;
                     }
                     else
                     {

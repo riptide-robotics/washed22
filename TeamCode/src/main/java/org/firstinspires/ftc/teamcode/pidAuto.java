@@ -28,6 +28,7 @@ public class pidAuto extends LinearOpMode {
        DcMotor motorFrontRight = hardwareMap.dcMotor.get("rightFront");
        DcMotor motorBackRight = hardwareMap.dcMotor.get("rightRear");*/
         DcMotor slides = hardwareMap.dcMotor.get("slides");
+        DcMotor slides2 = hardwareMap.dcMotor.get("slides2");
        /*Servo servo0 = hardwareMap.servo.get("servo0");
        Servo servo1 = hardwareMap.servo.get("servo1");
        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);/*/
@@ -60,6 +61,7 @@ public class pidAuto extends LinearOpMode {
         int reference = 500;
         ElapsedTime timer = new ElapsedTime();
         int integeralSum = 0;
+        int integeralSum2 = 0;
         int lasterror = 0;
         if (opModeIsActive()) {
             telemetry.addData("encoder val:", slides.getCurrentPosition());
@@ -69,6 +71,16 @@ public class pidAuto extends LinearOpMode {
                     int error = reference - encoderPos;
                     double derivative = (error - lasterror) / timer.seconds();
                     integeralSum += (error * timer.seconds());
+                    double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
+                    slides.setPower(out);
+                    lasterror = error;
+                    timer.reset();
+                }
+                while(slides2.getCurrentPosition() >= -500){
+                    int encoderPos = slides.getCurrentPosition();
+                    int error = reference - encoderPos;
+                    double derivative = (error - lasterror) / timer.seconds();
+                    integeralSum2 += (error * timer.seconds());
                     double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
                     slides.setPower(out);
                     lasterror = error;
