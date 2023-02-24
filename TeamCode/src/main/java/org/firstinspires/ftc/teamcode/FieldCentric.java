@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp
+@TeleOp(name="GIRLS INC", group="Demos")
 public class FieldCentric extends LinearOpMode {
     ElapsedTime clawPos = new ElapsedTime();
 
@@ -20,17 +20,17 @@ public class FieldCentric extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        clawPos.reset();
+       // clawPos.reset();
         // Declare our motors
         // Make sure your ID's match your configuration
         DcMotor motorFrontLeft = hardwareMap.dcMotor.get("leftFront");
         DcMotor motorBackLeft = hardwareMap.dcMotor.get("leftRear");
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("rightFront");
         DcMotor motorBackRight = hardwareMap.dcMotor.get("rightRear");
-        DcMotor slides = hardwareMap.dcMotor.get("slides");
-        Servo servo0 = hardwareMap.servo.get("servo0");
-        Servo servo1 = hardwareMap.servo.get("servo1");
-        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //DcMotor slides = hardwareMap.dcMotor.get("slides");
+        //Servo servo0 = hardwareMap.servo.get("servo0");
+        //Servo servo1 = hardwareMap.servo.get("servo1");
+        //slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         double offset = 0;
         boolean bool = true;
         double v = 0.85;
@@ -56,15 +56,15 @@ public class FieldCentric extends LinearOpMode {
             switch (state){
                 case OPEN:
                     if(gamepad2.b){
-                        servo0.setPosition(0.4);
-                        servo1.setPosition(0.45);
+                       // servo0.setPosition(0.4);
+                       // servo1.setPosition(0.45);
                         state = lifestate.CLOSED;
                     }
                     break;
                 case CLOSED:
                     if(gamepad2.a){
-                        servo0.setPosition(0.9);
-                        servo1.setPosition(0);
+                       // servo0.setPosition(0.9);
+                       // servo1.setPosition(0);
                         state = lifestate.OPEN;
                     }
                     break;
@@ -74,7 +74,7 @@ public class FieldCentric extends LinearOpMode {
             double y = 0.55 * gamepad1.left_stick_y; // Remember, this is reversed!
             double x = -0.55 * gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
             double rx = -0.55 * gamepad1.right_stick_x;
-            if(gamepad1.left_bumper)
+           /* if(gamepad1.left_bumper)
             {
                 y = 1.77 * y;
                 x = 1.77 * x;
@@ -128,6 +128,7 @@ public class FieldCentric extends LinearOpMode {
                servo0.setPosition(1);
                servo1.setPosition(0);
            }*/
+
             double botHeading = -imu.getAngularOrientation().firstAngle;
             // Read inverse IMU heading, as the IMU heading is CW positive
             if(gamepad1.a)
