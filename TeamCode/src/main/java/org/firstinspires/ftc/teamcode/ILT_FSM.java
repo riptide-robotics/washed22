@@ -193,10 +193,13 @@ public class ILT_FSM extends LinearOpMode {
                     }
                     if (leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0 && armServo.getPosition() == 1) {
                             armServo.setPosition(0);
-                            armServo.setPosition(1);
+                            armServo2.setPosition(1);
                             clawServo.setPosition(0);
                             clawServo2.setPosition(1);
                             claw.setPosition(0);
+
+
+
                             cycling = cycle.EXTEND_HOR_VER;
                         }
                         else {
@@ -211,23 +214,45 @@ public class ILT_FSM extends LinearOpMode {
                     }
 
                     if (armServo.getPosition() == 0 && leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0) {
-                        leftVert.setTargetPosition(SLIDES_MAX_LENGTH);
-                        rightVert.setTargetPosition(SLIDES_MAX_LENGTH);
-                        leftVert.setPower(MOTOR_POWER);
-                        rightVert.setPower(MOTOR_POWER);
-                        leftHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
-                        rightHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
-                        leftHoriz.setPower(MOTOR_POWER);
-                        rightHoriz.setPower(MOTOR_POWER);
                         armServo.setPosition(1);
                         armServo2.setPosition(0);
                         clawServo.setPosition(1);
                         clawServo2.setPosition(0);
-                        cycling = cycle.DEPOSITCONE;
+                        leftVert.setTargetPosition(SLIDES_MAX_LENGTH);
+                        rightVert.setTargetPosition(SLIDES_MAX_LENGTH);
+                        leftVert.setPower(MOTOR_POWER);
+                        rightVert.setPower(MOTOR_POWER);
+                        while (!gamepad1.dpad_left && leftHoriz.getCurrentPosition() < SLIDES_MAX_LENGTH) {
+                            double latestContour = ContourPipeline.getLargestSize();
+                            if (latestContour > SMALLEST_CONE_THRESH && latestContour < LARGEST_CONE_THRESH) {
+                                claw.setPosition(1);
+                                leftHoriz.setTargetPosition(leftHoriz.getCurrentPosition());
+                                rightHoriz.setTargetPosition(rightHoriz.getCurrentPosition());
+
+                                break;
+                            }
+                        /*
+                        The setTargetPosition from here and on is temperary, we are implementing PID loops
+
+                        how the PID loop will work is this
+
+                        Check if the cone is in range, ( already done from line 125 to 130)
+                        if cone is in range, then set target position is
+                        Set target position to MAX_RANGE note that max range is a little less than the actual max range
+                        start moving. This way we can stop the PID loop on its way to the max and we avoid juttering too much.
+                         */
+
+                            leftHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
+                            rightHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
+                            leftHoriz.setPower(MOTOR_POWER);
+                            rightHoriz.setPower(MOTOR_POWER);
+
+                            cycling = cycle.DEPOSITCONE;
+                        }
                     }
                     else
                     {
-                        cycling = cycle.GRABCONE;
+                        cycling = cycle.TRANSFER;
                     }
                     break;
 
