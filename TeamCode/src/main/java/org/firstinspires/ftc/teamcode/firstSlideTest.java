@@ -11,11 +11,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 @Config
-public class horizPID extends LinearOpMode {
+public class firstSlideTest extends LinearOpMode {
     public static double ki = 0;
     public static double kp = 0.1;
     public static double kd = 0.1;
-    public static double reset = 0;
+    public static int onOff = 0;
+    public static double power = 0;
     public void PIDloop(double targetPosition, DcMotor motor1, DcMotor motor2)
     {
         double integeralSum = 0;
@@ -48,13 +49,13 @@ public class horizPID extends LinearOpMode {
        DcMotor motorBackRight = hardwareMap.dcMotor.get("rightRear");*/
         DcMotor leftHoriz = hardwareMap.dcMotor.get("leftHoriz");
         DcMotor rightHoriz = hardwareMap.dcMotor.get("rightHoriz");
-        leftHoriz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftHoriz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // leftHoriz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        // leftHoriz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         /*Servo servo0 = hardwareMap.servo.get("servo0");
        Servo servo1 = hardwareMap.servo.get("servo1");
        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);/*/
         double offset = 0;
-        boolean bool = true;
+        boolean boole = true;
 
         // Reverse thv e right side motors
         // Reverse left motors if you are using NeveRests
@@ -70,16 +71,25 @@ public class horizPID extends LinearOpMode {
         //imu.initialize(parameters);
 
         waitForStart();
-
-        if (isStopRequested()) return;
-
-        PIDloop(500, leftHoriz, rightHoriz);
-
+        while (opModeIsActive()) {
+            if (isStopRequested()) return;
+            //PIDloop(500, leftHoriz, rightHoriz);
+            //MOTORS NEED TO ROTATE IN THE SAME DIRECTION
+            if (onOff == 1) {
+                rightHoriz.setPower(-power);
+                leftHoriz.setPower(power);
+            } else if (onOff == 2) {
+                rightHoriz.setPower(power);
+                leftHoriz.setPower(-power);
+            } else {
+                rightHoriz.setPower(0);
+                leftHoriz.setPower(0);
+            }
 
 
         }
         //sorry my bad2
 
-
-        // Read inverse IMU heading, as the IMU heading is CW positive
     }
+    // Read inverse IMU heading, as the IMU heading is CW positive
+}

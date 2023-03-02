@@ -20,9 +20,9 @@ import java.util.List;
 
 
 
-public class ContourPipeline extends OpenCvPipeline {
+public class ContourPipelineRed extends OpenCvPipeline {
 
-    public Scalar lower = new Scalar(0, 0, 130.3);
+    public Scalar lower = new Scalar(0, 160.1, 0);
     public Scalar upper = new Scalar(255, 255, 255);
 
 
@@ -51,10 +51,10 @@ public class ContourPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
 
 
-         //Takes our "input" mat as an input, and outputs to a separate Mat buffer "ycrcbMat"
+        //Takes our "input" mat as an input, and outputs to a separate Mat buffer "ycrcbMat"
         Imgproc.cvtColor(input, ycrcbmat, Imgproc.COLOR_RGB2YCrCb);
 
-         //Order is source, lowerBound, upperbound, dst.
+        //Order is source, lowerBound, upperbound, dst.
         Core.inRange(ycrcbmat, lower, upper, binaryMat);
 
         /*
@@ -63,7 +63,7 @@ public class ContourPipeline extends OpenCvPipeline {
          */
         maskedInputMat.release();
 
-         //Order: src1, src2, dst, mask.
+        //Order: src1, src2, dst, mask.
         Core.bitwise_and(input, input, maskedInputMat, binaryMat);
 
         // now the masked input mat is the filtered image with colors and shit.
