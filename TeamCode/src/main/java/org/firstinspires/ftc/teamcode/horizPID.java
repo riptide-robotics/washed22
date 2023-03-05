@@ -21,7 +21,8 @@ public class horizPID extends LinearOpMode {
         double integeralSum = 0;
         double lasterror = 0;
         ElapsedTime timer = new ElapsedTime();
-        while (motor1.getCurrentPosition() <= 500) {
+        while (motor1.getCurrentPosition() <= 500)
+        {
             double encoderPos = motor1.getCurrentPosition();
             double error = targetPosition - encoderPos;
             double derivative = (error - lasterror) / timer.seconds();

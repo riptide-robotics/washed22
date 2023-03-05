@@ -118,8 +118,7 @@ public class ILT_FSM_PID extends LinearOpMode {
         Servo clawServo = hardwareMap.servo.get("servo4wrist");
         // one of these servos does NOT have anything plugged in! please remember to test which is
         // which and remove the one that's not connected to anything from this segment of the code
-        Servo clawServo2 = hardwareMap.servo.get("servo5wrist");
-        Servo claw = hardwareMap.servo.get("servo6claw");
+        Servo claw = hardwareMap.servo.get("servo5claw");
 
 
 
@@ -216,7 +215,6 @@ public class ILT_FSM_PID extends LinearOpMode {
                         armServo.setPosition(0.45);
                         armServo2.setPosition(0.55);
                         clawServo.setPosition(0.55);
-                        clawServo2.setPosition(0.45);
                         claw.setPosition(0.5);
                         cycling = cycle.EXTEND_HOR_VER;
                     }

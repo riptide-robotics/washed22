@@ -33,7 +33,8 @@ public class ILT_FSM extends LinearOpMode {
     ElapsedTime iltBotStuff = new ElapsedTime();
 
 
-    // The "States" for the finite state Machine, also known as FSM from now
+    // The "States" for the finite state Machine,
+    // also known as FSM from now
     public enum cycle{
         SWEEP,
         GRABCONE,
