@@ -20,6 +20,9 @@ public class ZoomZoom extends LinearOpMode {
     public static double arm = 0.5;
     public static double wrist = 0.5;
     public static double claw = 0.5;
+    public static int onOff = 0;
+    public static double power = 0;
+    public static int horiz = 0;
 
     @Override
     // related to inheritance: runOpMode is a necessary function as you NEED to override the runOpMode in the superclass
@@ -30,8 +33,19 @@ public class ZoomZoom extends LinearOpMode {
         Servo servo2 = hardwareMap.servo.get("servo2arm");
         Servo servo3 = hardwareMap.servo.get("servo3arm");
         Servo servo4 = hardwareMap.servo.get("servo4wrist");
-        Servo servo5 = hardwareMap.servo.get("servo5wrist");
+        //Servo servo5 = hardwareMap.servo.get("servo5wrist");
         Servo servo6 = hardwareMap.servo.get("servo6claw");
+        DcMotor leftHoriz = hardwareMap.dcMotor.get("leftHoriz");
+        DcMotor rightHoriz = hardwareMap.dcMotor.get("rightHoriz");
+        DcMotor rightVert = hardwareMap.dcMotor.get("rightVert");
+        DcMotor leftVert = hardwareMap.dcMotor.get("leftVert");
+        rightVert.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightVert.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftVert.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftVert.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+
         // int encoderValue = 0;
         boolean bool = false;
 
@@ -55,13 +69,33 @@ public class ZoomZoom extends LinearOpMode {
             double x = gamepad1.left_stick_x * 1.1 * 0.47; // Counteract imperfect strafing
             double rx = gamepad1.right_stick_x * 0.47;
 
-            servo0.setPosition(out);
-            servo1.setPosition(1 - out);
-            servo2.setPosition(arm);
-            servo3.setPosition(1-arm);
-            servo4.setPosition(wrist);
-            servo5.setPosition(1-wrist);
-            servo6.setPosition(claw);
+           // servo0.setPosition(out);
+           // servo1.setPosition(1 - out);
+           // servo2.setPosition(arm);
+            //servo3.setPosition(1-arm);
+           // servo4.setPosition(wrist);
+            //servo5.setPosition(1-wrist);
+           // servo6.setPosition(claw);
+            if (onOff == 1) {
+                leftVert.setPower(-power);
+                rightVert.setPower(power);
+            } else if (onOff == 2) {
+                leftVert.setPower(power);
+                rightVert.setPower(-power);
+            } else {
+                leftVert.setPower(0);
+                rightVert.setPower(0);
+            }
+            if (horiz == 1) {
+                leftHoriz.setPower(-power);
+                rightHoriz.setPower(power);
+            } else if (horiz == 2) {
+                leftHoriz.setPower(power);
+                rightHoriz.setPower(-power);
+            } else {
+                leftHoriz.setPower(0);
+                rightHoriz.setPower(0);
+            }
             // ReLEASE slide to drop claw.
 
 
@@ -96,7 +130,8 @@ public class ZoomZoom extends LinearOpMode {
 
 
 
-
+            telemetry.addData("rightSlide encoder:", rightHoriz.getCurrentPosition());
+            telemetry.addData("vert encoder", rightVert.getCurrentPosition());
             telemetry.update();
         }
     }
