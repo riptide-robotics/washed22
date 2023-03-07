@@ -139,6 +139,7 @@ public class FieldCentric extends LinearOpMode {
             {
                 offset = 0;
             }
+
             double rotX = x * Math.cos(botHeading - offset) - y * Math.sin(botHeading - offset);
             double rotY = x * Math.sin(botHeading - offset) + y * Math.cos(botHeading - offset);
 

@@ -33,7 +33,7 @@ public class ZoomZoom extends LinearOpMode {
         Servo servo2 = hardwareMap.servo.get("servo2arm");
         Servo servo3 = hardwareMap.servo.get("servo3arm");
         Servo servo4 = hardwareMap.servo.get("servo4wrist");
-        Servo servo5 = hardwareMap.servo.get("servo5wrist");
+        //Servo servo5 = hardwareMap.servo.get("servo5wrist");
         Servo servo6 = hardwareMap.servo.get("servo6claw");
         DcMotor leftHoriz = hardwareMap.dcMotor.get("leftHoriz");
         DcMotor rightHoriz = hardwareMap.dcMotor.get("rightHoriz");
@@ -69,13 +69,13 @@ public class ZoomZoom extends LinearOpMode {
             double x = gamepad1.left_stick_x * 1.1 * 0.47; // Counteract imperfect strafing
             double rx = gamepad1.right_stick_x * 0.47;
 
-            servo0.setPosition(out);
-            servo1.setPosition(1 - out);
-            servo2.setPosition(arm);
-            servo3.setPosition(1-arm);
-            servo4.setPosition(wrist);
+           // servo0.setPosition(out);
+           // servo1.setPosition(1 - out);
+           // servo2.setPosition(arm);
+            //servo3.setPosition(1-arm);
+           // servo4.setPosition(wrist);
             //servo5.setPosition(1-wrist);
-            servo6.setPosition(claw);
+           // servo6.setPosition(claw);
             if (onOff == 1) {
                 leftVert.setPower(-power);
                 rightVert.setPower(power);

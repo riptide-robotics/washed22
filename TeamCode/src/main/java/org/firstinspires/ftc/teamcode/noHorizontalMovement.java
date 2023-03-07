@@ -133,7 +133,7 @@ public class noHorizontalMovement extends LinearOpMode {
             if(gamepad2.a)
             {
                 servo2.setPosition(0.18);
-                servo3.setPosition(0.82);
+                servo3.setPosition(0.82) ;
             }
             if(gamepad2.left_trigger > 0.2)
             {
