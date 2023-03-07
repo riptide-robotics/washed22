@@ -16,13 +16,13 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp(name = "ilt fsm", group = "linear opmode")
+@TeleOp(name = "ILTFINAL", group = "linear opmode")
 
 @Config
 public class ILT_FSM extends LinearOpMode {
 
     //Consts, these consts right now are crude, as we don't have a bot rn ;-;
-    public static int SLIDES_MAX_LENGTH = 900;
+    public static int SLIDES_MAX_LENGTH = 100;
     public static double MOTOR_POWER = 0.5;
     public static double SMALLEST_CONE_THRESH = 1000.0;
     public static double LARGEST_CONE_THRESH = 2000.0;
@@ -79,20 +79,10 @@ public class ILT_FSM extends LinearOpMode {
         DcMotor motorBackLeft = hardwareMap.dcMotor.get("leftRear");
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("rightFront");
         DcMotor motorBackRight = hardwareMap.dcMotor.get("rightRear");
-        DcMotor leftHoriz = hardwareMap.dcMotor.get("leftHoriz");
-        DcMotor rightHoriz = hardwareMap.dcMotor.get("rightHoriz");
-        DcMotor leftVert = hardwareMap.dcMotor.get("leftVert");
-        DcMotor rightVert = hardwareMap.dcMotor.get("rightVert");
-        //run all motors using the encoders
-
-        leftHoriz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftHoriz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightHoriz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightHoriz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftVert.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftVert.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightVert.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightVert.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        DcMotor leftHoriz = hardwareMap.dcMotor.get("leftHorizontal");
+        DcMotor rightHoriz = hardwareMap.dcMotor.get("slides2");
+        DcMotor leftVert = hardwareMap.dcMotor.get("slides3");
+        DcMotor rightVert = hardwareMap.dcMotor.get("slides4");
 
         Servo vertServo = hardwareMap.servo.get("servo0");
         Servo vertServo2 = hardwareMap.servo.get("servo1");
@@ -338,7 +328,9 @@ public class ILT_FSM extends LinearOpMode {
             motorBackLeft.setPower(backLeftPower);
             motorFrontRight.setPower(frontRightPower);
             motorBackRight.setPower(backRightPower);
-
+            telemetry.addData("y speed:", y);
+            telemetry.addData("x speed:", x);
+            telemetry.update();
         }
     }
 }

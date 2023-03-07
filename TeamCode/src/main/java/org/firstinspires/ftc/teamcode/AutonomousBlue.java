@@ -73,13 +73,8 @@ public class AutonomousBlue extends LinearOpMode {
         DcMotor motorBackLeft = hardwareMap.dcMotor.get("leftRear");
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("rightFront");
         DcMotor motorBackRight = hardwareMap.dcMotor.get("rightRear");
-        Servo servo0 = hardwareMap.servo.get("servo0out");
-        Servo servo1 = hardwareMap.servo.get("servo1out");
-        Servo servo2 = hardwareMap.servo.get("servo2arm");
-        Servo servo3 = hardwareMap.servo.get("servo3arm");
-        Servo servo4 = hardwareMap.servo.get("servo4wrist");
-        Servo servo5 = hardwareMap.servo.get("servo5wrist");
-        Servo servo6 = hardwareMap.servo.get("servo6claw");
+        Servo servo0 = hardwareMap.servo.get("servo0");
+        Servo servo1 = hardwareMap.servo.get("servo1");
         motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -90,16 +85,9 @@ public class AutonomousBlue extends LinearOpMode {
         motorBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-
-
         //cam shit
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
@@ -122,53 +110,57 @@ public class AutonomousBlue extends LinearOpMode {
          * This REPLACES waitForStart!
          */
         while (!isStarted() && !isStopRequested()) {
+            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+            servo0.setPosition(0);
+            servo1.setPosition(1);
+
+            if (currentDetections.size() != 0) {
 
 
+
+
+                for (AprilTagDetection tag : currentDetections) {
+                    tagNum = tag.id;
+                }
+
+                if (tagNum == 1) {
+                    // pos 1
+                    telemetry.addLine("tag 1 detected yo, you a real one");
+
+
+
+                }
+                if (tagNum == 2) {
+                    // pos 2
+                    telemetry.addLine("tag 2 detected yo, doing well fam");
+
+                }
+                if (tagNum == 3) {
+                    // pos 3
+                    telemetry.addLine("tag 3 detected yo, hope you bussing g");
+
+                }
+                telemetry.update();
+                sleep(20);
+            }
         }
 
         if (opModeIsActive()) {
-            servo2.setPosition(0.18);
-            servo3.setPosition(0.82);
-            servo4.setPosition(0.6);
-            servo5.setPosition(0.4);
-            sleep(2000);
-            int counter = 1000;
-            while(counter > 0) {
+            if (tagNum == 1) {
+                servo0.setPosition(0.4);
+                servo1.setPosition(0.45);
+                motorBackLeft.setPower(-0.25);
+                motorFrontRight.setPower(-0.25);
+                motorBackRight.setPower(0.25);
+                motorFrontLeft.setPower(0.25);
+                sleep(2250);
+                motorBackLeft.setPower(-0.25);
+                motorFrontRight.setPower(-0.25);
+                motorBackRight.setPower(-0.25);
+                motorFrontLeft.setPower(-0.25);
+                sleep(2200);
 
-
-                ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-
-                if (currentDetections.size() != 0) {
-
-
-                    for (AprilTagDetection tag : currentDetections) {
-                        tagNum = tag.id;
-                        telemetry.addData("tagnum", tagNum);
-                        telemetry.update();
-                    }
-                }
-                counter--;
-            }
-            servo2.setPosition(0.4);
-            servo3.setPosition(0.6);
-            sleep(500);
-                if (tagNum == 1) {
-                    motorBackLeft.setPower(-0.25);
-                    motorFrontRight.setPower(-0.25);
-                    motorBackRight.setPower(0.25);
-                    motorFrontLeft.setPower(0.25);
-                    sleep(2200);
-                    motorBackLeft.setPower(-0.25);
-                    motorFrontRight.setPower(-0.25);
-                    motorBackRight.setPower(-0.25);
-                    motorFrontLeft.setPower(-0.25);
-                    sleep(1950);
-                    motorBackLeft.setPower(0.25);
-                    motorBackRight.setPower(0.25);
-                    motorFrontLeft.setPower(0.25);
-                    motorBackRight.setPower(0.25);
-
-                    // pos 1
+                // pos 1
                 /*
                 motorBackRight.setTargetPosition(200);
                 motorBackLeft.setTargetPosition(200);
@@ -205,69 +197,64 @@ public class AutonomousBlue extends LinearOpMode {
                 motorBackRight.setPower(0.1);
                 */
 
-                }
-                /* else if (tagNum == 2) {
-                    // pos 2
-                    motorBackLeft.setPower(-0.25);
-                    motorFrontRight.setPower(-0.25);
-                    motorBackRight.setPower(-0.25);
-                    motorFrontLeft.setPower(-0.25);
-                    sleep(2200);
-                    motorBackLeft.setPower(0);
-                    motorBackRight.setPower(0);
-                    motorFrontLeft.setPower(0);
-                    motorBackRight.setPower(0);
+            }
+            else if (tagNum == 2) {
+                // pos 2
+                servo0.setPosition(0.4);
+                servo1.setPosition(0.45);
+                motorBackLeft.setPower(-0.25);
+                motorFrontRight.setPower(-0.25);
+                motorBackRight.setPower(-0.25);
+                motorFrontLeft.setPower(-0.25);
+                telemetry.update();
+                sleep(2200);
 
-                }*/ else if (tagNum == 3) {
-                    // pos 3
-                    motorBackLeft.setPower(0.25);
-                    motorFrontRight.setPower(0.25);
-                    motorBackRight.setPower(-0.25);
-                    motorFrontLeft.setPower(-0.25);
-                    sleep(2200);
-                    motorBackLeft.setPower(-0.25);
-                    motorFrontRight.setPower(-0.25);
-                    motorBackRight.setPower(-0.25);
-                    motorFrontLeft.setPower(-0.25);
-                    sleep(1950);
-                    motorBackLeft.setPower(0);
-                    motorBackRight.setPower(0);
-                    motorFrontLeft.setPower(0);
-                    motorBackRight.setPower(0);
+            }
+            else if (tagNum == 3) {
+                // pos 3
+                servo0.setPosition(0.4);
+                servo1.setPosition(0.45);
+                motorBackLeft.setPower(0.25);
+                motorFrontRight.setPower(0.25);
+                motorBackRight.setPower(-0.25);
+                motorFrontLeft.setPower(-0.25);
+                sleep(2200);
+                motorBackLeft.setPower(-0.25);
+                motorFrontRight.setPower(-0.25);
+                motorBackRight.setPower(-0.25);
+                motorFrontLeft.setPower(-0.25);
+                sleep(2250);
 
 
-                } else {
-                    motorBackLeft.setPower(-0.25);
-                    motorFrontRight.setPower(-0.25);
-                    motorBackRight.setPower(-0.25);
-                    motorFrontLeft.setPower(-0.25);
-                    sleep(2200);
-                    motorBackLeft.setPower(0);
-                    motorBackRight.setPower(0);
-                    motorFrontLeft.setPower(0);
-                    motorBackRight.setPower(0);
-
-                }
 
 
-                sleep(30000);
+
+            }
+            else
+            {
+                motorBackLeft.setPower(-0.25);
+                motorFrontRight.setPower(-0.25);
+                motorBackRight.setPower(-0.25);
+                motorFrontLeft.setPower(-0.25);
+                sleep(2200);
+
             }
         }
-        /*
-         * The START command just came in: now work off the latest snapshot acquired
-         * during the init loop.
-         */
+        }
+            /*
+             * The START command just came in: now work off the latest snapshot acquired
+             * during the init loop.
+             */
 
-        /* Update the telemetry */
+            /* Update the telemetry */
 
-        /* Actually do something useful */
+            /* Actually do something useful */
 
 
 
-        /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
+            /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
 
-    }
-
+        }
 
 
 

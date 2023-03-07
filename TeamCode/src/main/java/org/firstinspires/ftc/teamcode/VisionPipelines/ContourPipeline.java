@@ -22,7 +22,7 @@ import java.util.List;
 
 public class ContourPipeline extends OpenCvPipeline {
 
-    public Scalar lower = new Scalar(0, 0, 130.3);
+    public Scalar lower = new Scalar(0, 160.1, 0);
     public Scalar upper = new Scalar(255, 255, 255);
 
 

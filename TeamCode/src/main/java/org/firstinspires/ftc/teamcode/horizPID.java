@@ -15,29 +15,6 @@ public class horizPID extends LinearOpMode {
     public static double ki = 0;
     public static double kp = 0.1;
     public static double kd = 0.1;
-    public static double reset = 0;
-    public void PIDloop(double targetPosition, DcMotor motor1, DcMotor motor2)
-    {
-        double integeralSum = 0;
-        double lasterror = 0;
-        ElapsedTime timer = new ElapsedTime();
-        while (motor1.getCurrentPosition() <= 500)
-        {
-            double encoderPos = motor1.getCurrentPosition();
-            double error = targetPosition - encoderPos;
-            double derivative = (error - lasterror) / timer.seconds();
-            integeralSum += (error * timer.seconds());
-            double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
-            motor1.setPower(out);
-            motor2.setPower(out);
-            telemetry.addData("encoder position:", motor1.getCurrentPosition());
-            telemetry.addData("output power:", out);
-            telemetry.addData("x?", gamepad2.x);
-            telemetry.update();
-            lasterror = error;
-            timer.reset();
-        }
-    }
     // helper functions
     @Override
     public void runOpMode() throws InterruptedException {
@@ -74,13 +51,37 @@ public class horizPID extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        PIDloop(500, leftHoriz, rightHoriz);
-
-
-
+        int reference = 500;
+        ElapsedTime timer = new ElapsedTime();
+        double integeralSum = 0;
+        double lasterror = 0;
+        while (opModeIsActive()) {
+            if (gamepad2.x) {
+                while (leftHoriz.getCurrentPosition() <= 500) {
+                    double encoderPos = leftHoriz.getCurrentPosition();
+                    double error = reference - encoderPos;
+                    double derivative = (error - lasterror) / timer.seconds();
+                    integeralSum += (error * timer.seconds());
+                    double out = (kp * error) + (ki * integeralSum) + (kd * derivative);
+                    leftHoriz.setPower(out);
+                    rightHoriz.setPower(out);
+                    telemetry.addData("encoder position:", leftHoriz.getCurrentPosition());
+                    telemetry.addData("output power:", out);
+                    telemetry.addData("x?", gamepad2.x);
+                    telemetry.update();
+                    lasterror = error;
+                    timer.reset();
+                }
+            }
+            if(gamepad2.y)
+            {
+                leftHoriz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                leftHoriz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
         }
         //sorry my bad2
 
 
         // Read inverse IMU heading, as the IMU heading is CW positive
     }
+}
