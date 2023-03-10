@@ -20,7 +20,7 @@ import java.util.List;
 
 
 
-public class ContourPipeline extends OpenCvPipeline {
+public class ActuallyContourPipeline extends OpenCvPipeline {
 
     public Scalar lower = new Scalar(0, 160.1, 0);
     public Scalar upper = new Scalar(255, 255, 255);
@@ -57,10 +57,10 @@ public class ContourPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
 
 
-         //Takes our "input" mat as an input, and outputs to a separate Mat buffer "ycrcbMat"
+        //Takes our "input" mat as an input, and outputs to a separate Mat buffer "ycrcbMat"
         Imgproc.cvtColor(input, ycrcbmat, Imgproc.COLOR_RGB2YCrCb);
 
-         //Order is source, lowerBound, upperbound, dst.
+        //Order is source, lowerBound, upperbound, dst.
         Core.inRange(ycrcbmat, lower, upper, binaryMat);
 
         /*
@@ -69,7 +69,7 @@ public class ContourPipeline extends OpenCvPipeline {
          */
         maskedInputMat.release();
 
-         //Order: src1, src2, dst, mask.
+        //Order: src1, src2, dst, mask.
         Core.bitwise_and(input, input, maskedInputMat, binaryMat);
 
         // now the masked input mat is the filtered image with colors and shit.
@@ -113,18 +113,6 @@ public class ContourPipeline extends OpenCvPipeline {
         }
 
 
-        // now this can be removed during the meet.
-        if (onlyContours == 1)
-        {
-            activeMat = maskedInputMat;
-        }
-        else if (onlyContours == 2)
-        {
-            activeMat = emptyMat;
-        }
-        else {
-            activeMat = input;
-        }
 
         for (int i = 0; i < contours.size(); i++) {
 
@@ -133,11 +121,6 @@ public class ContourPipeline extends OpenCvPipeline {
             contourArea = Imgproc.contourArea(contour);
 
             // A simple filter I cam up with ;P
-            if (contourArea < noiseSensitivity)
-            {
-                continue;
-            }
-
             if (contourArea > largestArea)
             {
                 largestArea = contourArea;
@@ -149,25 +132,9 @@ public class ContourPipeline extends OpenCvPipeline {
         currentLargest = largestArea;
 
         // pretty sure that we actually don't need this for the meet either,
-        // but is good for demonstration purposes and debugging
-        if (contours.size() != 0 && largestArea != 0)
-        {
-            // Adding Text3
-            Imgproc.putText (
-                    activeMat,                                                             // Matrix obj of the image
-                    largestArea + "",                                                      // Text to be added
-                    new Point(boundRect[index].tl().x, boundRect[index].tl().y),           // point
-                    Imgproc.FONT_HERSHEY_SIMPLEX ,                                         // front face
-                    1,                                                                     // front scale
-                    contourColors,                                                         // Scalar object for color
-                    2                                                                      // Thickness
-            );
-            Imgproc.drawContours(activeMat, contoursPolyList, index, contourColors, contourSize);
-            Imgproc.rectangle(activeMat, boundRect[index].tl(), boundRect[index].br(), contourColors, 2);
+        // but is good for demonstration purposes and debuggin
 
-        }
-
-        return activeMat;
+        return maskedInputMat;
     }
 
     // I think we could have just returned a Mat frame and have the FSM and Auton do the computing, but that is like
@@ -179,13 +146,4 @@ public class ContourPipeline extends OpenCvPipeline {
 
 
     // boilerplate code if there is a better way to do this, please tell me
-    @Override
-    public void onViewportTapped()
-    {
-        if (onlyContours == 1 || onlyContours == 2)
-            onlyContours++;
-        else
-            onlyContours = 1;
-    }
-
 }

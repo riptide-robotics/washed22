@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-import org.firstinspires.ftc.teamcode.PIDController;
-
 @Autonomous(name="  meet Regional woah", group="Cool Stuffs")
 
 public class REGIONAL extends LinearOpMode {

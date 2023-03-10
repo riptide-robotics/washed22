@@ -9,10 +9,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp
+@TeleOp(name="poopnuggest", group="Linear Opmode")
+@Config
 public class PidTesting extends LinearOpMode {
 
-
+    public static double kp = 0;
+    public static double ki = 0;
+    public static double kd = 0;
 
 
     @Override
@@ -23,12 +26,12 @@ public class PidTesting extends LinearOpMode {
        DcMotor motorBackLeft = hardwareMap.dcMotor.get("leftRear");
        DcMotor motorFrontRight = hardwareMap.dcMotor.get("rightFront");
        DcMotor motorBackRight = hardwareMap.dcMotor.get("rightRear");*/
-        DcMotor slides = hardwareMap.dcMotor.get("slides");
+        DcMotor slides = hardwareMap.dcMotor.get("vertical_slides1");
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        DcMotor slides2 = hardwareMap.dcMotor.get("slides2");
-        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        DcMotor slides2 = hardwareMap.dcMotor.get("vertical_slides2");
+        slides2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slides2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
        /*Servo servo0 = hardwareMap.servo.get("servo0");
        Servo servo1 = hardwareMap.servo.get("servo1");
        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);/*/
@@ -54,9 +57,6 @@ public class PidTesting extends LinearOpMode {
 
 
 
-        double kp = 0.1;
-        double ki = 0;
-        double kd = 0.1;
 
         int reference = 500;
         ElapsedTime timer = new ElapsedTime();
