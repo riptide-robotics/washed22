@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.VisionPipelines;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -43,7 +45,7 @@ public class ContourPipeline extends OpenCvPipeline {
     private final Mat edgeDetectorFrame = new Mat();
     private int onlyContours = 1;
 
-    private static double currentLargest = 0;
+    public static double currentLargest = 0;
 
     Mat activeMat;
     Mat emptyMat = Mat.zeros(edgeDetectorFrame.size(), CvType.CV_8UC3);
@@ -55,14 +57,10 @@ public class ContourPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-
-
          //Takes our "input" mat as an input, and outputs to a separate Mat buffer "ycrcbMat"
         Imgproc.cvtColor(input, ycrcbmat, Imgproc.COLOR_RGB2YCrCb);
-
          //Order is source, lowerBound, upperbound, dst.
         Core.inRange(ycrcbmat, lower, upper, binaryMat);
-
         /*
          * Release the reusable Mat so that old data doesn't
          * affect the next step in the current processing
@@ -131,7 +129,6 @@ public class ContourPipeline extends OpenCvPipeline {
             MatOfPoint contour = contours.get(i);
 
             contourArea = Imgproc.contourArea(contour);
-
             // A simple filter I cam up with ;P
             if (contourArea < noiseSensitivity)
             {
@@ -147,6 +144,7 @@ public class ContourPipeline extends OpenCvPipeline {
         }
 
         currentLargest = largestArea;
+
 
         // pretty sure that we actually don't need this for the meet either,
         // but is good for demonstration purposes and debugging
@@ -164,7 +162,6 @@ public class ContourPipeline extends OpenCvPipeline {
             );
             Imgproc.drawContours(activeMat, contoursPolyList, index, contourColors, contourSize);
             Imgproc.rectangle(activeMat, boundRect[index].tl(), boundRect[index].br(), contourColors, 2);
-
         }
 
         return activeMat;
@@ -176,6 +173,8 @@ public class ContourPipeline extends OpenCvPipeline {
     {
         return currentLargest;
     }
+
+
 
 
     // boilerplate code if there is a better way to do this, please tell me

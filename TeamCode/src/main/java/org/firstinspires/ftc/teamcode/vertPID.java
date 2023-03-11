@@ -13,16 +13,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 @TeleOp
 @Config
-public class horizPID extends LinearOpMode {
-
+public class vertPID extends LinearOpMode {
     public static PIDController controller;
     public static double ki = 0;
-    public static double kp = 0.004;
-    public static double kd = 0;
+    public static double kp = 0.1;
+    public static double kd = 0.1;
 
     public static double kf = 0;
 
@@ -55,12 +52,9 @@ public class horizPID extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         controller = new PIDController(kp, ki, kd);
-        FtcDashboard dashboard = FtcDashboard.getInstance();
-        Telemetry dashboardTelemetry = dashboard.getTelemetry();
-
-
-        DcMotorEx rightHoriz = hardwareMap.get(DcMotorEx.class, "rightHoriz");
-        DcMotorEx leftHoriz = hardwareMap.get(DcMotorEx.class, "leftHoriz");
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        DcMotorEx rightVert = hardwareMap.get(DcMotorEx.class, "rightVert");
+        DcMotorEx leftVert = hardwareMap.get(DcMotorEx.class, "leftVert");
 
 
 
@@ -92,19 +86,19 @@ public class horizPID extends LinearOpMode {
 
         while (opModeIsActive()) {
             //actual pid code??
-            int slidePos = rightHoriz.getCurrentPosition();
+            int slidePos = rightVert.getCurrentPosition();
             double pid = controller.calculate(slidePos, target);
             //useless additional feedforward controller! yay!
             // this is meant for arms to counteract gravity
             double ff = kf;
             double power = pid + ff;
-            leftHoriz.setPower(power);
-            rightHoriz.setPower(power);
-            dashboardTelemetry.addData("slidePos, " , slidePos);
-            dashboardTelemetry.addData("target, ", target);
-            dashboardTelemetry.addData("power", power);
-            dashboardTelemetry.addData("leftSlidePos", -leftHoriz.getCurrentPosition());
-            dashboardTelemetry.update();
+            leftVert.setPower(-power);
+            rightVert.setPower(power);
+            telemetry.addData("slidePos, " , slidePos);
+            telemetry.addData("target, ", target);
+            telemetry.addData("power", power);
+            telemetry.addData("leftSlidePos", -leftVert.getCurrentPosition());
+            telemetry.update();
         }
         //sorry my bad2
 

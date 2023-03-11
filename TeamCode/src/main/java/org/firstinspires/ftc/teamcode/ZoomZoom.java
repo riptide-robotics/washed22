@@ -75,12 +75,11 @@ public class ZoomZoom extends LinearOpMode {
 
         //set webcam Pipeline
         webcam.setPipeline(new ActuallyContourPipeline());
-
         //You're creating an instance of the AsyncCameraOpenListener class. The class contains the two methods, onOpened and onError, which you are overriding with your code. That instance is passed to the openCameraDeviceAsync method as a parameter.
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                webcam.startStreaming(640, 360, OpenCvCameraRotation.UPRIGHT);
+                webcam.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -147,9 +146,10 @@ public class ZoomZoom extends LinearOpMode {
             }
             // ReLEASE slide to drop claw.
 
-            double Largest_Contour = ContourPipeline.getLargestSize();
+            double Largest_Contour = ContourPipeline.currentLargest;
+
+
             telemetry.addData("Largest Contour", Largest_Contour);
-            telemetry.addData("dummy value", rightHoriz.getPower());
 
             if (Largest_Contour > threshold)
             {
