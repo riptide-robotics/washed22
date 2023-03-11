@@ -22,7 +22,9 @@ import java.util.List;
 
 public class ActuallyContourPipeline extends OpenCvPipeline {
 
-    public Scalar lower = new Scalar(0, 160.1, 0);
+    public static Scalar lower = new Scalar(0, 160.1, 0);
+    public static Scalar blue_lower = new Scalar(0, 0, 138.8);
+    public static Scalar red_lower = new Scalar(0, 160.1, 0);
     public Scalar upper = new Scalar(255, 255, 255);
 
 
@@ -160,6 +162,22 @@ public class ActuallyContourPipeline extends OpenCvPipeline {
     public static double getLargestSize()
     {
         return currentLargest;
+    }
+
+    public static double setTeamFilter(int team)
+    {
+        // 0 for red, 1 for blue
+
+        if (team == 0)
+        {
+            lower = red_lower;
+        }
+        else
+        {
+            lower = blue_lower;
+        }
+
+        return team;
     }
 
 

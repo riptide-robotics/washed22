@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.VisionPipelines;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -123,6 +121,8 @@ public class ContourPipeline extends OpenCvPipeline {
         else {
             activeMat = input;
         }
+
+        largestArea = 0;
 
         for (int i = 0; i < contours.size(); i++) {
 
