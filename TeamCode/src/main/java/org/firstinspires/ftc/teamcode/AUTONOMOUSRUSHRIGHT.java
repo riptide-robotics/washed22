@@ -127,8 +127,6 @@ public class AUTONOMOUSRUSHRIGHT extends LinearOpMode {
          */
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-            servo0.setPosition(0);
-            servo1.setPosition(1);
 
             if (currentDetections.size() != 0) {
 

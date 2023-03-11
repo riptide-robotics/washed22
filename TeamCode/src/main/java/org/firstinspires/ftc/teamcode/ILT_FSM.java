@@ -223,7 +223,7 @@ public class ILT_FSM extends LinearOpMode {
                         break;
                     }
                     v_pid = v_controller.calculate(leftVert.getCurrentPosition(), -5);
-                    h_pid = h_controller.calculate(leftHoriz.getCurrentPosition(), -5);
+                    h_pid = h_controller.calculate(leftHoriz.getCurrentPosition(), H_MAX);
                     leftHoriz.setPower(h_pid);
                     rightHoriz.setPower(h_pid);
 

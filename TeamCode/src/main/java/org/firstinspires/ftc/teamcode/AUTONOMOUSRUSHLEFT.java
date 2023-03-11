@@ -35,7 +35,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
-@Autonomous(name="  meet 3 auto", group="Cool Stuffs")
+@Autonomous(name="DO THIS FOR NOW", group="Cool Stuffs")
 public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -103,7 +103,7 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
         //cam shit
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
@@ -133,10 +133,12 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
 
         if (opModeIsActive()) {
             // move down to activate camera
+            //0.6
+            //0.7
 
-            right_elbow.setPosition(1-ELBOW_DOWN);
-            left_elbow.setPosition(ELBOW_DOWN);
-            wrist.setPosition(WRIST_DOWN);
+            right_elbow.setPosition(0.4);
+            left_elbow.setPosition(0.6);
+            wrist.setPosition(0.7);
             int counterVar = 0;
             int firstTagNum = 0;
             while(counterVar < 70)
@@ -145,17 +147,21 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
                 if(currentDetections.size() > 0)
                 {
                     firstTagNum = currentDetections.get(0).id;
+                    break;
                 }
                 sleep(20);
+
             }
-            if (tagNum == 1) {
+            telemetry.addData("Tag:", firstTagNum);
+            if (firstTagNum == 1) {
+
                 servo0.setPosition(0.4);
                 servo1.setPosition(0.45);
                 motorBackLeft.setPower(-0.25);
                 motorFrontRight.setPower(-0.25);
                 motorBackRight.setPower(0.25);
                 motorFrontLeft.setPower(0.25);
-                sleep(2250);
+                sleep(2300);
                 motorBackLeft.setPower(-0.25);
                 motorFrontRight.setPower(-0.25);
                 motorBackRight.setPower(-0.25);
@@ -200,7 +206,7 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
                 */
 
             }
-            else if (tagNum == 2) {
+            else if (firstTagNum == 2) {
                 // pos 2
                 servo0.setPosition(0.4);
                 servo1.setPosition(0.45);
@@ -212,7 +218,7 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
                 sleep(2200);
 
             }
-            else if (tagNum == 3) {
+            else if (firstTagNum == 3) {
                 // pos 3
                 servo0.setPosition(0.4);
                 servo1.setPosition(0.45);
@@ -220,7 +226,7 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
                 motorFrontRight.setPower(0.25);
                 motorBackRight.setPower(-0.25);
                 motorFrontLeft.setPower(-0.25);
-                sleep(2200);
+                sleep(2250);
                 motorBackLeft.setPower(-0.25);
                 motorFrontRight.setPower(-0.25);
                 motorBackRight.setPower(-0.25);
@@ -238,6 +244,7 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
                 sleep(2200);
 
             }
+            telemetry.update();
         }
         }
             /*
