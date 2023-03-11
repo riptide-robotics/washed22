@@ -23,7 +23,9 @@ import org.openftc.easyopencv.OpenCvWebcam;
 public class ILT_FSM extends LinearOpMode {
 
     //Consts, these consts right now are crude, as we don't have a bot rn ;-;
-    public static int SLIDES_MAX_LENGTH = 100;
+    public static int SLIDES_MAX_LENGTH = 870;
+    private final int H_MAX = 700;
+    private final int V_MAX = 870;
     public static double MOTOR_POWER = 0.5;
     public static double SMALLEST_CONE_THRESH = 1000.0;
     public static double LARGEST_CONE_THRESH = 2000.0;
@@ -159,14 +161,14 @@ public class ILT_FSM extends LinearOpMode {
                             rightHoriz.setPower(h_power);
                         }
 
-                        if (rightHoriz.getCurrentPosition() >= 8) {
+                        if (leftVert.getCurrentPosition() >= 8) {
                             v_pid = v_controller.calculate(leftVert.getCurrentPosition(), 0);
 
 
                             v_power = v_pid + ff;
 
-                            leftVert.setPower(-v_power);
-                            rightVert.setPower(v_power);
+                            leftVert.setPower(-v_pid - vkf);
+                            rightVert.setPower(v_pid + vkf);
 
                         }
 
@@ -194,7 +196,7 @@ public class ILT_FSM extends LinearOpMode {
                         wrist.setPosition((WRIST_UP-WRIST_DOWN)/2);
                         h_pid = h_controller.calculate(leftHoriz.getCurrentPosition(), 700);
                         v_pid = v_controller.calculate(leftVert.getCurrentPosition(), 700);
-                        while (!gamepad1.dpad_left && leftHoriz.getCurrentPosition() <  SLIDES_MAX_LENGTH)
+                        while (!gamepad1.dpad_left && leftHoriz.getCurrentPosition() <  H_MAX)
                         {
                             double latestContour = ContourPipeline.getLargestSize();
                             if (latestContour > SMALLEST_CONE_THRESH)
@@ -253,19 +255,23 @@ public class ILT_FSM extends LinearOpMode {
                         break;
                     }
 
-                    if (leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0 && left_elbow.getPosition() == 1) {
-                            left_elbow.setPosition(0);
-                            right_elbow.setPosition(1);
-                            wrist.setPosition(0);
-                            claw.setPosition(0);
+                    wrist.setPosition(WRIST_DOWN);
+
+                    claw.setPosition(CLAW_OPEN);
+
+                    // just to get out of the way.
+                    left_elbow.setPosition(0.7);
+                    right_elbow.setPosition(0.3);
+                    // 900
+
+                    if (gamepad2.dpad_up) {
+                        v_pid = v_controller.calculate(leftVert.getCurrentPosition(), V_MAX);
+                        leftVert.setPower(-v_pid - vkf);
+                        rightVert.setPower(v_pid + vkf);
 
 
-
-                            cycling = cycle.EXTEND_HOR_VER;
-                        }
-                        else {
-                            cycling = cycle.GRABCONE;
-                        }
+                        cycling = cycle.EXTEND_HOR_VER;
+                    }
 
                     break;
                 case EXTEND_HOR_VER:
