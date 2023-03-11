@@ -127,8 +127,6 @@ public class ActuallyContourPipeline extends OpenCvPipeline {
         }
         largestArea = 0;
 
-        currentLargest = 0;
-
         for (int i = 0; i < contours.size(); i++) {
 
             MatOfPoint contour = contours.get(i);
@@ -153,22 +151,6 @@ public class ActuallyContourPipeline extends OpenCvPipeline {
 
         // pretty sure that we actually don't need this for the meet either,
         // but is good for demonstration purposes and debugging
-        if (contours.size() != 0 && largestArea != 0)
-        {
-            // Adding Text3
-            Imgproc.putText (
-                    activeMat,                                                             // Matrix obj of the image
-                    largestArea + "",                                                      // Text to be added
-                    new Point(boundRect[index].tl().x, boundRect[index].tl().y),           // point
-                    Imgproc.FONT_HERSHEY_SIMPLEX ,                                         // front face
-                    1,                                                                     // front scale
-                    contourColors,                                                         // Scalar object for color
-                    2                                                                      // Thickness
-            );
-            Imgproc.drawContours(activeMat, contoursPolyList, index, contourColors, contourSize);
-            Imgproc.rectangle(activeMat, boundRect[index].tl(), boundRect[index].br(), contourColors, 2);
-
-        }
 
         return activeMat;
     }

@@ -56,7 +56,7 @@ public class AutonoomousWebcamTesting extends OpMode
     @Override // This stuff happens when you click the play button
     public void loop()
     {
-        double current_largest_contour = ContourPipeline.getLargestSize();
+        double current_largest_contour = ActuallyContourPipeline.getLargestSize();
         telemetry.addData("Contour Area", current_largest_contour);
 
         if (current_largest_contour > claw_close_thresh)
