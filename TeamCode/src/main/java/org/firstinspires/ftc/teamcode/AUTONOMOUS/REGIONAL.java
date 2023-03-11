@@ -22,7 +22,7 @@ public class REGIONAL extends LinearOpMode {
     public static double kStatic = 0;
 
     //beginning pos
-    public static double startpos = 0;
+    public static double startpos = 100;
 
 
 
