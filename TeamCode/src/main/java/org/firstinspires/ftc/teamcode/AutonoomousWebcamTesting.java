@@ -21,7 +21,7 @@ public class AutonoomousWebcamTesting extends OpMode
     // webcamdude is the webcam. I'm not naming it anything else
     OpenCvWebcam Webcam = null;
 
-     Servo claw;
+    Servo claw;
 
     public double claw_close_thresh = 0;
     boolean clawOn = true;
