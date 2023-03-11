@@ -20,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class horizPID extends LinearOpMode {
 
     public static PIDController controller;
-    public static double ki = 0;
+    public static double ki = 0.001;
     public static double kp = 0.009;
     public static double kd = 0;
 

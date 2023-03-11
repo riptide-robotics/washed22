@@ -19,19 +19,24 @@
  * SOFTWARE.
  */
 package org.firstinspires.ftc.teamcode;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.*;
-//import com.qualcomm.robotcore.hardware.HardwareMap.*;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.VisionPipelines.AprilTagDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+
 import java.util.ArrayList;
-import org.firstinspires.ftc.teamcode.VisionPipelines.AprilTagDetectionPipeline;
-@Autonomous(name="  meet 3 auto", group="Cool Stuffs")
-public class AutonomousBlue extends LinearOpMode {
+
+@Autonomous(name="RUSH RIGHT", group="Cool Stuffs")
+public class AUTONOMOUSRUSHRIGHT extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 

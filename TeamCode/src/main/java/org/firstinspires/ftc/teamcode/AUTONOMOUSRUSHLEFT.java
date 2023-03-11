@@ -19,19 +19,24 @@
  * SOFTWARE.
  */
 package org.firstinspires.ftc.teamcode;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.*;
-//import com.qualcomm.robotcore.hardware.HardwareMap.*;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.VisionPipelines.AprilTagDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+
 import java.util.ArrayList;
-import org.firstinspires.ftc.teamcode.VisionPipelines.AprilTagDetectionPipeline;
+
 @Autonomous(name="  meet 3 auto", group="Cool Stuffs")
-public class AutonomousBlue extends LinearOpMode {
+public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -121,42 +126,28 @@ public class AutonomousBlue extends LinearOpMode {
          * This REPLACES waitForStart!
          */
         while (!isStarted() && !isStopRequested()) {
-            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-            servo0.setPosition(0);
-            servo1.setPosition(1);
-
-            if (currentDetections.size() != 0) {
 
 
 
-
-                for (AprilTagDetection tag : currentDetections) {
-                    tagNum = tag.id;
-                }
-
-                if (tagNum == 1) {
-                    // pos 1
-                    telemetry.addLine("tag 1 detected yo, you a real one");
-
-
-
-                }
-                if (tagNum == 2) {
-                    // pos 2
-                    telemetry.addLine("tag 2 detected yo, doing well fam");
-
-                }
-                if (tagNum == 3) {
-                    // pos 3
-                    telemetry.addLine("tag 3 detected yo, hope you bussing g");
-
-                }
-                telemetry.update();
-                sleep(20);
-            }
         }
 
         if (opModeIsActive()) {
+            // move down to activate camera
+
+            right_elbow.setPosition(1-ELBOW_DOWN);
+            left_elbow.setPosition(ELBOW_DOWN);
+            wrist.setPosition(WRIST_DOWN);
+            int counterVar = 0;
+            int firstTagNum = 0;
+            while(counterVar < 70)
+            {
+                ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+                if(currentDetections.size() > 0)
+                {
+                    firstTagNum = currentDetections.get(0).id;
+                }
+                sleep(20);
+            }
             if (tagNum == 1) {
                 servo0.setPosition(0.4);
                 servo1.setPosition(0.45);
@@ -235,19 +226,15 @@ public class AutonomousBlue extends LinearOpMode {
                 motorBackRight.setPower(-0.25);
                 motorFrontLeft.setPower(-0.25);
                 sleep(2250);
-
-
-
-
-
             }
             else
+            //april tags don't work? go to vegas baby, drive forward for a 1/3
             {
-                // SPEED TO THE RIGHT
-                motorBackLeft.setPower(0.25);
-                motorFrontRight.setPower(0.25);
-                motorBackRight.setPower(-0.25);
-                motorFrontLeft.setPower(-0.25);
+                // SPEED TO THE FWD
+                motorBackLeft.setPower(-0.25);
+                motorFrontRight.setPower(-0.25);
+                motorBackRight.setPower(0.25);
+                motorFrontLeft.setPower(0.25);
                 sleep(2200);
 
             }

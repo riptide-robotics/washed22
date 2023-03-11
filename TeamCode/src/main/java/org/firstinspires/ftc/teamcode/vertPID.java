@@ -93,8 +93,7 @@ public class vertPID extends LinearOpMode {
             //actual pid code??
             int slidePos = rightVert.getCurrentPosition();
             double pid = controller.calculate(slidePos, target);
-            //useless additional feedforward controller! yay!
-            // this is meant for arms to counteract gravity
+            // this is meant for slides to counteract gravity
             double ff = kf;
             double power = pid + ff;
             leftVert.setPower(-power);
