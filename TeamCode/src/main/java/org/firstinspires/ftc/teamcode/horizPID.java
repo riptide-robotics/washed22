@@ -21,7 +21,7 @@ public class horizPID extends LinearOpMode {
 
     public static PIDController controller;
     public static double ki = 0;
-    public static double kp = 0.004;
+    public static double kp = 0.009;
     public static double kd = 0;
 
     public static double kf = 0;
@@ -29,6 +29,7 @@ public class horizPID extends LinearOpMode {
     public static int target = 0;
 
     private final double ticks_in_degrees = 145.1/360.0;
+
 
     public void PIDloop(double targetPosition, DcMotor motor1, DcMotor motor2) {
         double integeralSum = 0;
@@ -61,6 +62,10 @@ public class horizPID extends LinearOpMode {
 
         DcMotorEx rightHoriz = hardwareMap.get(DcMotorEx.class, "rightHoriz");
         DcMotorEx leftHoriz = hardwareMap.get(DcMotorEx.class, "leftHoriz");
+        leftHoriz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightHoriz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftHoriz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightHoriz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
 
@@ -91,7 +96,8 @@ public class horizPID extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            //actual pid code??
+
+            //actual pid code?
             int slidePos = rightHoriz.getCurrentPosition();
             double pid = controller.calculate(slidePos, target);
             //useless additional feedforward controller! yay!

@@ -40,6 +40,13 @@ public class FieldCentric extends LinearOpMode {
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+
         // Retrieve the IMU from the hardware map
         BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -71,9 +78,9 @@ public class FieldCentric extends LinearOpMode {
 
 
             }
-            double y = 0.55 * gamepad1.left_stick_y; // Remember, this is reversed!
-            double x = -0.55 * gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-            double rx = -0.55 * gamepad1.right_stick_x;
+            double y = 0.65 * gamepad1.left_stick_y; // Remember, this is reversed!
+            double x = -0.65 * gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+            double rx = -0.65 * gamepad1.right_stick_x;
            /* if(gamepad1.left_bumper)
             {
                 y = 1.77 * y;
@@ -139,9 +146,22 @@ public class FieldCentric extends LinearOpMode {
             {
                 offset = 0;
             }
+            if(gamepad1.x)
+            {
+                x *= 1.3;
+                y *= 1.3;
+                rx *= 1.3;
+            }
+            if(gamepad1.y)
+            {
+                x *= 0.35;
+                y *= 0.35;
+                rx *= 0.35;
+            }
 
             double rotX = x * Math.cos(botHeading - offset) - y * Math.sin(botHeading - offset);
             double rotY = x * Math.sin(botHeading - offset) + y * Math.cos(botHeading - offset);
+
 
 
             // Denominator is the largest motor power (absolute value) or 1

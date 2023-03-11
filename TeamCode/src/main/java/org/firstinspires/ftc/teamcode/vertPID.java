@@ -18,11 +18,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Config
 public class vertPID extends LinearOpMode {
     public static PIDController controller;
-    public static double ki = 0;
-    public static double kp = 0.1;
-    public static double kd = 0.1;
+    public static double ki = 0.003;
+    public static double kp = 0.008;
+    public static double kd = 0;
 
-    public static double kf = 0;
+    public static double kf = 0.04;
 
     public static int target = 0;
 
@@ -56,6 +56,10 @@ public class vertPID extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         DcMotorEx rightVert = hardwareMap.get(DcMotorEx.class, "rightVert");
         DcMotorEx leftVert = hardwareMap.get(DcMotorEx.class, "leftVert");
+        leftVert.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightVert.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftVert.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightVert.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
 
