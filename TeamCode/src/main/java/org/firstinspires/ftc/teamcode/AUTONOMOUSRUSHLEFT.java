@@ -141,7 +141,7 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
             wrist.setPosition(0.7);
             int counterVar = 0;
             int firstTagNum = 0;
-            while(counterVar < 70)
+            while(counterVar < 20)
             {
                 ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
                 if(currentDetections.size() > 0)
@@ -153,6 +153,9 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
 
             }
             telemetry.addData("Tag:", firstTagNum);
+
+            right_elbow.setPosition(1 - ELBOW_UP);
+            left_elbow.setPosition(ELBOW_UP);
             if (firstTagNum == 1) {
 
                 servo0.setPosition(0.4);
@@ -161,7 +164,7 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
                 motorFrontRight.setPower(-0.25);
                 motorBackRight.setPower(0.25);
                 motorFrontLeft.setPower(0.25);
-                sleep(2300);
+                sleep(2400);
                 motorBackLeft.setPower(-0.25);
                 motorFrontRight.setPower(-0.25);
                 motorBackRight.setPower(-0.25);
@@ -226,7 +229,7 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
                 motorFrontRight.setPower(0.25);
                 motorBackRight.setPower(-0.25);
                 motorFrontLeft.setPower(-0.25);
-                sleep(2250);
+                sleep(2400);
                 motorBackLeft.setPower(-0.25);
                 motorFrontRight.setPower(-0.25);
                 motorBackRight.setPower(-0.25);
@@ -246,21 +249,8 @@ public class AUTONOMOUSRUSHLEFT extends LinearOpMode {
             }
             telemetry.update();
         }
-        }
-            /*
-             * The START command just came in: now work off the latest snapshot acquired
-             * during the init loop.
-             */
-
-            /* Update the telemetry */
-
-            /* Actually do something useful */
-
-
-
-            /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-
-        }
+    }
+}
 
 
 
