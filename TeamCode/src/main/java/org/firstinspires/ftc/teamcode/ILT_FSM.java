@@ -212,6 +212,8 @@ public class ILT_FSM extends LinearOpMode {
                             rightHoriz.setPower(h_power);
 
                         }
+                        claw.setPosition(0.4);
+                        cycling = cycle.RESET;
                     }
 
 
@@ -276,51 +278,20 @@ public class ILT_FSM extends LinearOpMode {
                     break;
                 case EXTEND_HOR_VER:
                     if(gamepad2.dpad_left){
-                        cycling = cycle.SWEEP;
+                        cycling = cycle.RESET;
                         break;
                     }
+                    h_pid = h_controller.calculate(leftHoriz.getCurrentPosition(), -5);
+                    leftHoriz.setPower(h_pid);
+                    rightHoriz.setPower(h_pid);
 
-                    if (left_elbow.getPosition() == 0 && leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0) {
-                        left_elbow.setPosition(1);
-                        right_elbow.setPosition(0);
-                        wrist.setPosition(1);
-                        leftVert.setTargetPosition(SLIDES_MAX_LENGTH);
-                        rightVert.setTargetPosition(SLIDES_MAX_LENGTH);
-                        leftVert.setPower(MOTOR_POWER);
-                        rightVert.setPower(MOTOR_POWER);
-                        while (!gamepad1.dpad_left && leftHoriz.getCurrentPosition() < SLIDES_MAX_LENGTH) {
-                            double latestContour = ContourPipeline.getLargestSize();
-                            if (latestContour > SMALLEST_CONE_THRESH && latestContour < LARGEST_CONE_THRESH) {
-                                claw.setPosition(1);
-                                leftHoriz.setTargetPosition(leftHoriz.getCurrentPosition());
-                                rightHoriz.setTargetPosition(rightHoriz.getCurrentPosition());
 
-                                break;
-                            }
-                        /*
-                        The setTargetPosition from here and on is temperary, we are implementing PID loops
-
-                        how the PID loop will work is this
-
-                        Check if the cone is in range, ( already done from line 125 to 130)
-                        if cone is in range, then set target position is
-                        Set target position to MAX_RANGE note that max range is a little less than the actual max range
-                        start moving. This way we can stop the PID loop on its way to the max and we avoid juttering too much.
-                         */
-
-                            leftHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
-                            rightHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
-                            leftHoriz.setPower(MOTOR_POWER);
-                            rightHoriz.setPower(MOTOR_POWER);
-
-                            cycling = cycle.DEPOSITCONE;
-                        }
-                    }
-                    else
-                    {
-                        cycling = cycle.TRANSFER;
-                    }
+                    cycling = cycle.DEPOSITCONE;
                     break;
+
+
+
+
 
                 case DEPOSITCONE:
 
@@ -328,23 +299,12 @@ public class ILT_FSM extends LinearOpMode {
                         cycling = cycle.SWEEP;
                         break;
                     }
-                    if (left_elbow.getPosition() == 0 && leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0) {
-                        servo0.setPosition(1);
-                        servo1.setPosition(0);
-                        sleep(50);
-                        servo0.setPosition(0);
-                        servo1.setPosition(1);
-                        leftVert.setTargetPosition(0);
-                        rightVert.setTargetPosition(0);
-                        leftVert.setPower(-MOTOR_POWER);
-                        rightVert.setPower(-MOTOR_POWER);
-                        cycling = cycle.SWEEP;
-                    }
-                    else
-                    {
-                        cycling = cycle.EXTEND_HOR_VER;
-                    }
-
+                    servo1.setPosition(BUCKET_DOWN);
+                    servo0.setPosition(BUCKET_UP);
+                    sleep(50);
+                    servo1.setPosition(BUCKET_UP);
+                    servo0.setPosition(BUCKET_DOWN);
+                    cycling = cycle.RESET;
                     break;
 
             }
