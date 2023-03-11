@@ -145,9 +145,87 @@ public class ILT_Backup extends LinearOpMode{
             else if(gamepad2.y)
             {
                 leftVert.setPower(0.9);
-
+                rightVert.setPower(-0.9);
+            }
+            if(gamepad2.dpad_left)
+            {
+                left_elbow.setPosition(0.6);
+                right_elbow.setPosition(0.4);
+            }
+            if(gamepad2.dpad_down)
+            {
+                left_elbow.setPosition(ELBOW_DOWN);
+                right_elbow.setPosition(1-ELBOW_DOWN);
+            }
+            if(gamepad2.dpad_up)
+            {
+                left_elbow.setPosition(ELBOW_UP);
+                right_elbow.setPosition(1-ELBOW_UP);
+            }
+            if(gamepad2.right_bumper)
+            {
+                wrist.setPosition(WRIST_DOWN);
+            }
+            if(gamepad2.left_bumper)
+            {
+                wrist.setPosition(WRIST_UP);
+            }
+            if(gamepad2.left_trigger > 0.5)
+            {
+                claw.setPosition(CLAW_CLOSE);
+            }
+            if(gamepad2.right_trigger > 0.5)
+            {
+                claw.setPosition(CLAW_OPEN);
             }
         }
+        double y = 0.55 * gamepad1.left_stick_y; // Remember, this is reversed!
+        double x = -0.55 * gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+        double rx = -0.55 * gamepad1.right_stick_x;
+        if(gamepad1.x)
+        {
+            y = 1.77 * y;
+            x = 1.77 * x;
+            rx = 1.77 * rx;
+        }
+        if(gamepad1.y)
+        {
+            y = 0.66 * y;
+            x = 0.66 * x;
+            rx = 0.66 * rx;
+        }
+
+
+        double botHeading = -imu.getAngularOrientation().firstAngle;
+        // Read inverse IMU heading, as the IMU heading is CW positive
+        if(gamepad1.a)
+        {
+            offset = -imu.getAngularOrientation().firstAngle;
+        }
+        if(gamepad1.b)
+        {
+            offset = 0;
+        }
+        double rotX = x * Math.cos(botHeading - offset) - y * Math.sin(botHeading - offset);
+        double rotY = x * Math.sin(botHeading - offset) + y * Math.cos(botHeading - offset);
+
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double frontLeftPower = (rotY + rotX + rx) / denominator;
+        double backLeftPower = (rotY - rotX + rx) / denominator;
+        double frontRightPower = (rotY - rotX - rx) / denominator;
+        double backRightPower = (rotY + rotX - rx) / denominator;
+
+        motorFrontLeft.setPower(frontLeftPower);
+        motorBackLeft.setPower(backLeftPower);
+        motorFrontRight.setPower(frontRightPower);
+        motorBackRight.setPower(backRightPower);
+        telemetry.addData("y speed:", y);
+        telemetry.addData("x speed:", x);
+        telemetry.update();
 
 
     }
