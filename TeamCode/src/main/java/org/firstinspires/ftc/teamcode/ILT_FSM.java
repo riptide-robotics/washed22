@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -27,6 +28,21 @@ public class ILT_FSM extends LinearOpMode {
     public static double SMALLEST_CONE_THRESH = 1000.0;
     public static double LARGEST_CONE_THRESH = 2000.0;
 
+    private final double CLAW_OPEN = 0.9;
+    private final double CLAW_CLOSE = 0.4;
+    private final double ELBOW_UP = 0.9;
+    private final double ELBOW_DOWN = 0.55;
+    private final double BUCKET_UP = 0.75;
+    private final double BUCKET_DOWN = 0.05;
+    private final double WRIST_DOWN = 0.7;
+    private final double WRIST_UP = 0.25;
+
+
+    //Add the kp in your code.
+    private final double vkf = 0.04;
+
+    PIDController h_controller;
+    PIDController v_controller;
 
     OpenCvWebcam camera = null;
     // I won't touch this but ?? what's this lmao
@@ -36,6 +52,7 @@ public class ILT_FSM extends LinearOpMode {
     // The "States" for the finite state Machine,
     // also known as FSM from now
     public enum cycle{
+        RESET,
         SWEEP,
         GRABCONE,
         RETRACTHORVER,
@@ -53,6 +70,9 @@ public class ILT_FSM extends LinearOpMode {
 
         // This is the only time that we use this lmao what
         iltBotStuff.reset();
+
+        h_controller = new PIDController(0.001,0.009, 0);
+        v_controller = new PIDController(0.008, 0.003, 0);
 
         WebcamName webcamname = hardwareMap.get(WebcamName.class, "Webcam");
         // Acquire the camera ID
@@ -84,19 +104,24 @@ public class ILT_FSM extends LinearOpMode {
         DcMotor leftVert = hardwareMap.dcMotor.get("slides3");
         DcMotor rightVert = hardwareMap.dcMotor.get("slides4");
 
-        Servo vertServo = hardwareMap.servo.get("servo0");
-        Servo vertServo2 = hardwareMap.servo.get("servo1");
-        Servo armServo = hardwareMap.servo.get("servo2");
-        Servo armServo2 = hardwareMap.servo.get("servo3");
-        Servo clawServo = hardwareMap.servo.get("servo4");
-        Servo clawServo2 = hardwareMap.servo.get("servo5");
-        Servo claw = hardwareMap.servo.get("servo6");
-
+        Servo servo0 = hardwareMap.servo.get("servo0");
+        Servo servo1 = hardwareMap.servo.get("servo1");
+        Servo left_elbow = hardwareMap.servo.get("left_elbow");
+        Servo right_elbow = hardwareMap.servo.get("right_elbow");
+        Servo wrist = hardwareMap.servo.get("wrist");
+        Servo claw = hardwareMap.servo.get("claw");
 
         leftHoriz.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightHoriz.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftVert.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightVert.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftHoriz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftHoriz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftVert.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftVert.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
         double offset = 0;
 
 
@@ -113,90 +138,125 @@ public class ILT_FSM extends LinearOpMode {
         // Without this, data retrieving from the IMU throws an exception
         imu.initialize(parameters);
 
+        double h_pid;
+        double v_pid;
+        double h_power;
+        double v_power;
+        double ff = vkf;
+
         waitForStart();
 
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
             switch (cycling){
+                case RESET:
+                    if (gamepad2.a) {
+                        if (leftHoriz.getCurrentPosition() <= 8) {
+                            h_pid = h_controller.calculate(leftHoriz.getCurrentPosition(), 0);
+                            h_power = h_pid;
+                            leftHoriz.setPower(h_power);
+                            rightHoriz.setPower(h_power);
+                        }
+
+                        if (rightHoriz.getCurrentPosition() >= 8) {
+                            v_pid = v_controller.calculate(leftVert.getCurrentPosition(), 0);
+
+
+                            v_power = v_pid + ff;
+
+                            leftVert.setPower(-v_power);
+                            rightVert.setPower(v_power);
+
+                        }
+
+                        right_elbow.setPosition(1 - ELBOW_UP);
+                        left_elbow.setPosition(ELBOW_UP);
+
+                        claw.setPosition(CLAW_OPEN);
+                    }
+
+
+                    cycling = cycle.SWEEP;
+                    break;
+
                 case SWEEP:
                     if (!gamepad2.dpad_up)
                     {
                         break;
                     }
-
-                    while (!gamepad1.dpad_left && leftHoriz.getCurrentPosition() <  SLIDES_MAX_LENGTH )
+                    // Extend slides
+                    if (gamepad2.x)
                     {
-                        double latestContour = ContourPipeline.getLargestSize();
-                        if (latestContour > SMALLEST_CONE_THRESH && latestContour < LARGEST_CONE_THRESH) {
-                            claw.setPosition(1);
-                            leftHoriz.setTargetPosition(leftHoriz.getCurrentPosition());
-                            rightHoriz.setTargetPosition(rightHoriz.getCurrentPosition());
-                            cycling = cycle.GRABCONE;
-                            break;
+                        claw.setPosition(0.4);
+                        left_elbow.setPosition(ELBOW_DOWN);
+                        right_elbow.setPosition(1-ELBOW_DOWN);
+                        wrist.setPosition((WRIST_UP-WRIST_DOWN)/2);
+                        h_pid = h_controller.calculate(leftHoriz.getCurrentPosition(), 700);
+                        v_pid = v_controller.calculate(leftVert.getCurrentPosition(), 700);
+                        while (!gamepad1.dpad_left && leftHoriz.getCurrentPosition() <  SLIDES_MAX_LENGTH)
+                        {
+                            double latestContour = ContourPipeline.getLargestSize();
+                            if (latestContour > SMALLEST_CONE_THRESH)
+                            {
+
+                                h_pid = h_controller.calculate(leftHoriz.getCurrentPosition(), leftHoriz.getCurrentPosition() + 10);
+                                claw.setPosition(0.9);
+                                cycling = cycle.GRABCONE;
+                            }
+                            //we have this temp variable for syntatic sugar as we add kP
+                            h_power = h_pid;
+                            leftHoriz.setPower(h_power);
+                            rightHoriz.setPower(h_power);
+
                         }
-                        /*
-                        The setTargetPosition from here and on is temperary, we are implementing PID loops
-
-                        how the PID loop will work is this
-
-                        Check if the cone is in range, ( already done from line 125 to 130)
-                        if cone is in range, then set target position is
-                        Set target position to MAX_RANGE note that max range is a little less than the actual max range
-                        start moving. This way we can stop the PID loop on its way to the max and we avoid juttering too much.
-                         */
-
-                        leftHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
-                        rightHoriz.setTargetPosition(SLIDES_MAX_LENGTH);
-                        leftHoriz.setPower(MOTOR_POWER);
-                        rightHoriz.setPower(MOTOR_POWER);
-
                     }
 
-                    break;
 
+                    break;
+                // after you've grabbed cone, go back to home position!! REWRITTEN BY ALOK [check]
                 case GRABCONE:
                     if(gamepad2.dpad_left){
                         cycling = cycle.SWEEP;
                         break;
                     }
-                    if ((leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0)) {
-                        leftVert.setTargetPosition(0);
-                        rightVert.setTargetPosition(0);
-                        leftVert.setPower(-MOTOR_POWER);
+                    v_pid = v_controller.calculate(leftVert.getCurrentPosition(), -5);
+                    h_pid = h_controller.calculate(leftHoriz.getCurrentPosition(), -5);
+                    leftHoriz.setPower(h_pid);
+                    rightHoriz.setPower(h_pid);
 
-                        rightVert.setPower(-MOTOR_POWER);
-                        leftHoriz.setTargetPosition(0);
-                        rightHoriz.setTargetPosition(0);
-                        leftHoriz.setPower(-MOTOR_POWER);
-                        rightHoriz.setPower(-MOTOR_POWER);
-                        cycling = cycle.EXTEND_HOR_VER;
-                    }
-                    else if(leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0)
-                    {
-                        leftHoriz.setTargetPosition(0);
-                        rightHoriz.setTargetPosition(0);
-                        leftHoriz.setPower(-MOTOR_POWER);
-                        rightHoriz.setPower(-MOTOR_POWER);
-                        cycling = cycle.RETRACTHORVER;
-                    }
-                    else{
-                        cycling = cycle.SWEEP;
+                    leftVert.setPower(-v_pid - vkf);
+                    rightVert.setPower(v_pid + vkf);
+                    if(leftHoriz.getCurrentPosition() <= 10 && leftVert.getCurrentPosition() <= 10) {
+                        left_elbow.setPosition(ELBOW_UP);
+                        right_elbow.setPosition(1-ELBOW_UP);
+                        servo0.setPosition(BUCKET_DOWN);
+                        servo1.setPosition(BUCKET_UP);
+                        // I would put an if statement here depicting each height of junction.
+                        /*
+
+                        if ( gamepad i) -> set height to 100 or cycling = cycle.low_junc
+
+
+
+                         */
+                        cycling = cycle.TRANSFER;
                     }
 
                     break;
-
+                    // Extend time! extend vertical slides! remember to also move elbow down first - Aaron [check]
                 case TRANSFER:
 
-                    if(gamepad2.dpad_left){
+                    if(gamepad2.dpad_left)
+                    {
                         cycling = cycle.SWEEP;
                         break;
                     }
-                    if (leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0 && armServo.getPosition() == 1) {
-                            armServo.setPosition(0);
-                            armServo2.setPosition(1);
-                            clawServo.setPosition(0);
-                            clawServo2.setPosition(1);
+
+                    if (leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0 && left_elbow.getPosition() == 1) {
+                            left_elbow.setPosition(0);
+                            right_elbow.setPosition(1);
+                            wrist.setPosition(0);
                             claw.setPosition(0);
 
 
@@ -214,11 +274,10 @@ public class ILT_FSM extends LinearOpMode {
                         break;
                     }
 
-                    if (armServo.getPosition() == 0 && leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0) {
-                        armServo.setPosition(1);
-                        armServo2.setPosition(0);
-                        clawServo.setPosition(1);
-                        clawServo2.setPosition(0);
+                    if (left_elbow.getPosition() == 0 && leftVert.getCurrentPosition() == 0 && rightVert.getCurrentPosition() == 0) {
+                        left_elbow.setPosition(1);
+                        right_elbow.setPosition(0);
+                        wrist.setPosition(1);
                         leftVert.setTargetPosition(SLIDES_MAX_LENGTH);
                         rightVert.setTargetPosition(SLIDES_MAX_LENGTH);
                         leftVert.setPower(MOTOR_POWER);
@@ -263,12 +322,12 @@ public class ILT_FSM extends LinearOpMode {
                         cycling = cycle.SWEEP;
                         break;
                     }
-                    if (armServo.getPosition() == 0 && leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0) {
-                        vertServo.setPosition(1);
-                        vertServo2.setPosition(0);
+                    if (left_elbow.getPosition() == 0 && leftVert.getCurrentPosition() != 0 && rightVert.getCurrentPosition() != 0) {
+                        servo0.setPosition(1);
+                        servo1.setPosition(0);
                         sleep(50);
-                        vertServo.setPosition(0);
-                        vertServo2.setPosition(1);
+                        servo0.setPosition(0);
+                        servo1.setPosition(1);
                         leftVert.setTargetPosition(0);
                         rightVert.setTargetPosition(0);
                         leftVert.setPower(-MOTOR_POWER);
